@@ -4,31 +4,76 @@ import { useEffect, useRef, useState } from "react";
 import * as maptilersdk from "@maptiler/sdk";
 import { ENV } from "@/config/env";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
+import Emplazamiento from "./Forms/Emplazamiento";
+import Estacion from "./Forms/Estacion";
+import Sensor from "./Forms/Sensor";
+import {
+  BuildingLibraryIcon,
+  HomeIcon,
+  InboxIcon,
+} from "@heroicons/react/20/solid";
 
-export default function Map({ _selected, _setSelected, emplazamientos }) {
+export default function Map({
+  emplazamientos,
+  setE,
+  setShow,
+  _setData,
+  selected,
+  setSelected,
+  _data,
+  setContent,
+  markers,
+  setMarkers,
+  reload,
+  setReload,
+}) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const tokyo = { lng: 139.753, lat: 35.6844 };
 
   const [zoom] = useState(14);
-  const [markers, setMarkers] = useState([]);
 
   maptilersdk.config.apiKey = "blsofM73XhY4O2Ko7yXr";
 
   useEffect(() => {
-    /*
-    markers.forEach((mark) => {
-        const marker = new maptilersdk.Marker({
-          color: mark.color || "#FF0000",
-        })
-          .setLngLat([mark.lng, mark.lat])
-          .setPopup(new maptilersdk.Popup().setHTML(mark.text))
-          .addTo(map.current);
-        marker.togglePopup();
-      });
-    */
+    console.log(reload);
+    if (reload) {
+      // Eliminar marcadores
 
-    if (Array.isArray(emplazamientos) && emplazamientos.length > 0) {
+      if (Array.isArray(markers) && markers.length > 0) {
+        markers.forEach((mark) => {
+          mark.remove();
+        });
+      }
+
+      //setMarkers([]);
+      if (Array.isArray(emplazamientos) && emplazamientos.length > 0) {
+        // Crear nuevo marcador por cada emplazamiento
+        emplazamientos.forEach((em) => {
+          const marker = new maptilersdk.Marker({
+            color: em.state ? "green" : "gray",
+          })
+            .setLngLat([em.long, em.lat])
+            .setPopup(
+              new maptilersdk.Popup().setHTML(`
+            Nombre: ${em.name}<br>
+            Posición: [lng: ${em.long}, lat: ${em.lat}]          
+            `)
+            )
+            .addTo(map.current);
+
+          setMarkers([...markers, marker]);
+        });
+
+        setReload(false);
+      }
+    }
+  }, [markers, emplazamientos, reload]);
+
+  useEffect(() => {
+    //console.log(emplazamientos);
+
+    /*if (Array.isArray(emplazamientos) && emplazamientos.length > 0) {
       // Comprobamos que los datos sean validos
       emplazamientos.forEach((em) => {
         const marker = new maptilersdk.Marker({ color: em.color || "#FF0000" })
@@ -38,6 +83,64 @@ export default function Map({ _selected, _setSelected, emplazamientos }) {
         marker.togglePopup();
 
         if (markers.length < 2) setMarkers([...markers, marker]);
+      });
+    }*/
+
+    // Cada vez que haya un cambio en la variable _data, se cambiará el contenido
+
+    if (selected === 1) {
+      setContent(
+        <Emplazamiento
+          setSelected={setSelected}
+          setShow={setShow}
+          _data={_data}
+          _setData={_setData}
+          emplazamientos={emplazamientos}
+          setE={setE}
+          markers={markers}
+          setMarkers={setMarkers}
+          reload={reload}
+          setReload={setReload}
+        />
+      );
+    } else if (selected === 2) {
+      setContent(<Estacion _data={_data} _setData={_setData} />);
+    } else if (selected === 3) {
+      setContent(<Sensor _data={_data} _setData={_setData} />);
+    }
+
+    // ---
+
+    if (map.current) {
+      map.current.on("click", (e) => {
+        if (selected !== 0) {
+          _setData({
+            lat: e.lngLat.lat,
+            long: e.lngLat.lng,
+          });
+
+          //setE([]);
+
+          openModal();
+        }
+
+        /*console.log(_selected);
+        if (_selected.id != null) {
+          const newMarker = {
+            id: markers.length + 1,
+            lng: e.lngLat.lng,
+            lat: e.lngLat.lat,
+            text: `
+            Nombre: ${_selected.name}<br>
+            Posición: [lng: ${_selected.lng}, lat: ${_selected.lat}]          
+            `,
+            color: _selected.color,
+          };
+  
+          setMarkers([...markers, newMarker]);
+  
+          _setSelected({});
+        }*/
       });
     }
 
@@ -57,31 +160,35 @@ export default function Map({ _selected, _setSelected, emplazamientos }) {
       geolocateControl: true,
       navigationControl: true,
     });
+  }, [tokyo.lng, tokyo.lat, zoom, selected, _data]);
 
-    map.current.on("click", (e) => {
-      console.log(_selected);
-      if (_selected.id != null) {
-        const newMarker = {
-          id: markers.length + 1,
-          lng: e.lngLat.lng,
-          lat: e.lngLat.lat,
-          text: `
-          Nombre: ${_selected.name}<br>
-          Posición: [lng: ${_selected.lng}, lat: ${_selected.lat}]          
-          `,
-          color: _selected.color,
-        };
+  const openModal = (type) => {
+    setShow(true);
+  };
 
-        setMarkers([...markers, newMarker]);
+  const chooseIcon = (n) => {
+    const _ = {
+      1: <BuildingLibraryIcon className="w-5 h-auto" />,
+      2: <HomeIcon className="w-5 h-auto" />,
+      3: <InboxIcon className="w-5 h-auto" />,
+    };
 
-        _setSelected({});
-      }
-    });
-  }, [tokyo.lng, tokyo.lat, zoom, markers, _selected]);
+    return _[n];
+  };
+
+  const createMarker = ({ svg, width, height, lat, long, map }) => {
+    let markerElement = <div>{svg}</div>;
+    markerElement.style.width = width + "px";
+    markerElement.style.height = height + "px";
+
+    new maptilersdk.Marker({ element: markerElement })
+      .setLngLat([long, lat])
+      .addTo(map);
+  };
 
   return (
     <div className="w-full h-screen absolute top-0 m-0">
-      <div ref={mapContainer} className="w-full h-screen relative" />
+      <div ref={mapContainer} className={`w-full h-screen relative`} />
     </div>
   );
 }
