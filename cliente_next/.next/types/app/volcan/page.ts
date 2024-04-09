@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // File: D:\Volcan-Project\OVSAI-Repository\cliente_next\src\app\volcan\page.js
-=======
-// File: P:\jcalvaradop\2024\softwareOVSAI\OVSAI-Repository\cliente_next\src\app\volcan\page.js
->>>>>>> a3ae5695d3937190463fdf11d41378b13015bf77
 import * as entry from '../../../../src/app/volcan/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
