@@ -12,6 +12,7 @@ import {
   HomeIcon,
   InboxIcon,
 } from "@heroicons/react/20/solid";
+import MenuContext from "./Map/MenuCtx";
 
 export default function Map({
   emplazamientos,
@@ -30,6 +31,11 @@ export default function Map({
   const mapContainer = useRef(null);
   const map = useRef(null);
   const tokyo = { lng: 139.753, lat: 35.6844 };
+  const [Mposition, setMposition] = useState({
+    x: 0,
+    y: 0,
+    visible: false
+  })
 
   const [zoom] = useState(14);
 
@@ -37,6 +43,7 @@ export default function Map({
 
   useEffect(() => {
     console.log(reload);
+
     if (reload) {
       // Eliminar marcadores
 
@@ -62,6 +69,17 @@ export default function Map({
             )
             .addTo(map.current);
 
+            // Opciones al hacer clic derecho a los marcadores
+            marker.getElement().addEventListener("contextmenu", (e) => {
+              const {x, y} = e;
+
+              setMposition({
+                x: x,
+                y: y,
+                visible: true
+              })
+            })
+
           setMarkers([...markers, marker]);
         });
 
@@ -71,23 +89,6 @@ export default function Map({
   }, [markers, emplazamientos, reload]);
 
   useEffect(() => {
-    //console.log(emplazamientos);
-
-    /*if (Array.isArray(emplazamientos) && emplazamientos.length > 0) {
-      // Comprobamos que los datos sean validos
-      emplazamientos.forEach((em) => {
-        const marker = new maptilersdk.Marker({ color: em.color || "#FF0000" })
-          .setLngLat([em.pos.long, em.pos.lat])
-          .setPopup(new maptilersdk.Popup().setHTML(em.name))
-          .addTo(map.current);
-        marker.togglePopup();
-
-        if (markers.length < 2) setMarkers([...markers, marker]);
-      });
-    }*/
-
-    // Cada vez que haya un cambio en la variable _data, se cambiará el contenido
-
     if (selected === 1) {
       setContent(
         <Emplazamiento
@@ -113,6 +114,12 @@ export default function Map({
 
     if (map.current) {
       map.current.on("click", (e) => {
+        // Desactivar el menú o contextMenu de los marcadores
+        setMposition({
+          ...Mposition,
+          visible: false
+        })
+
         if (selected !== 0) {
           _setData({
             lat: e.lngLat.lat,
@@ -188,6 +195,7 @@ export default function Map({
 
   return (
     <div className="w-full h-screen absolute top-0 m-0">
+      {(Mposition.visible) ? <MenuContext Mposition={Mposition} setMPosition={setMposition} /> : <></>}
       <div ref={mapContainer} className={`w-full h-screen relative`} />
     </div>
   );

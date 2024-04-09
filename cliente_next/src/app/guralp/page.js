@@ -1,80 +1,44 @@
+// captura los datos CFG provenientes del servidor Django y los envía a los compontentes para ser
+
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import Sidebar from "../components/Sidebar";
-import Home from "../page";
-import Plot from "react-plotly.js";
+import Traza from '../components/Traza';
+import BoxPlot from '../components/BoxPlot';
+import SidebarTrazas from '../components/SidebarTrazas';
 import { useEffect, useState } from "react";
 
-export default function Guralp() {
-  const [Loading, setLoading] = useState(true);
-
-  const router = useRouter();
-
-  /*const getContent = () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const pathname = usePathname();
-    switch (pathname) {
-      case "/":
-        return <Home />;
-      case "/guralp":
-        return <Guralp />;
-      default:
-        return <h1>No encontrado</h1>;
-    }
-  };*/
-
-  /*useEffect(() => {
-    if (Loading) {
-      fetch("http://127.0.0.1:8000/")
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((err) => console.log(err));
-
-      setLoading(false);
-    }
-  }, [Loading]);*/
+export default function Pagina() {
 
   const [data, setData] = useState(null);
 
-  useEffect(() => {
-    if (Loading) {
-      fetchData();
-
-      setLoading(false);
-    }
-  }, [Loading]);
-
   const fetchData = async () => {
-    const response = await fetch("http://127.0.0.1:8000/api/data/");
+    const response = await fetch("http://127.0.0.1:8000/api/data/"); // recibe a la URL los datos de las trazas y sus descomposition
     const jsonData = await response.json();
 
-    console.log(jsonData); 
-    setData(jsonData); 
+    console.log(jsonData);
+    setData(jsonData);
   };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
+  if (data == null) {
+    return <p>Cargando...</p>
+  }
+
   return (
-    <div className="w-full h-full">
-      <Sidebar />
-      {/*getContent()*/}
-      <div className="absolute left-[340px] top-0">
-        <Plot
-          data={[
-            {
-              x: data != null ? ( 
-                data.xArray
-              ) : (""),
-              y: data != null ? (
-                data.yArray
-              ) : (""),
-              type: "bar",
-              orientation: "v",
-              marker: { color: "rgba(0,0,255)" },
-            },
-          ]}
-          layout={{ width: 500, height: 400, title: "A Fancy Plot" }}
-        />
+    <div className="flex">
+      <SidebarTrazas />
+      <div className="flex-1">
+        <div className="p-1">
+          <Traza dx={data.idx} dy={data.valores} dtitulo={"Traza individual: " + data.titulo} />
+          <Traza dx={data.tiempo} dy={data.estacionalidad} dtitulo={"Componente estacional: " + data.titulo} />
+          <Traza dx={data.tiempo} dy={data.ruido} dtitulo={"Componente residual: " + data.titulo} />
+          <Traza dx={data.tiempo} dy={data.tendencia} dtitulo={"Tendencia: " + data.titulo} />
+          <BoxPlot dy={data.valores} dtitulo={"Box-plot: " + data.titulo} />
+        </div>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 import {
   BuildingLibraryIcon,
   HomeIcon,
-  InboxIcon,
+  InboxIcon
 } from "@heroicons/react/20/solid";
 import Basic from "./Modals/Basic";
 import { useEffect, useState } from "react";
@@ -94,7 +94,7 @@ export default function Sidebar({
                       data-type="1"
                     ></div>
                     <span style={{ color: "gray" }}>
-                      <BuildingLibraryIcon className="w-full h-auto" />
+                      <BuildingLibraryIcon className="w-full h-auto" />                      
                       <span className="text-black">Emplaza...</span>
                     </span>
                   </li>
