@@ -12,16 +12,16 @@
       "static/css/app/page.css",
       "static/chunks/app/page.js"
     ],
-    "/guralp/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/guralp/page.js"
-    ],
     "/volcan/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/volcan/page.css",
       "static/chunks/app/volcan/page.js"
+    ],
+    "/guralp/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/guralp/page.js"
     ]
   }
 }

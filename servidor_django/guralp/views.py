@@ -6,19 +6,27 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from flask import Flask, request
-from flask_cors import CORS
-
-app = Flask(__name__)
-
-@app.route('/api/procesar_fecha/', methods=['POST'])
+@csrf_exempt
 def procesar_fecha(request):
-    data = request.json
-    selected_date = data['selectedDate']
-    # Procesa la fecha como desees
-    print(selected_date)
-    # Devuelve una respuesta si es necesario
-    return {'message': 'Fecha procesada correctamente'}
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            ruta = "D:/SGC/GCF/"
+            partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
+            anio = partes[0]
+            mes = partes[1]
+            ruta = ruta + anio + "/" + mes + "/"
+            print("ruta", ruta)
+            subfoldersNames = getSubfoldersNames(ruta)
+            print("subfolder_names: ", subfoldersNames)
+            return JsonResponse(subfoldersNames)
+        except json.JSONDecodeError:
+            pass
+    else:
+        subfoldersNames={'message': 'Fecha procesada, NO POST...'}
+        return JsonResponse(subfoldersNames)
+        #raise Http404()
 
 def trazas(request):
     archivoGcf = "04010000.gcf"
@@ -108,24 +116,3 @@ async def chat(request):
 
     return render(request, 'chat.html')
 
-@csrf_exempt
-def list_folders(request):
-    
-    ruta = "D:/SGC/GCF/"
-    #ruta = "X:/"
-    
-    if request.method != 'POST':
-        raise Http404()
-    data = json.loads(request.body)
-    fecha = data.get('fecha')
-
-    partes = fecha.split("-")  # Divide la cadena en partes usando el guion como separador
-    anio = partes[0]
-    mes = partes[1]
-    ruta = ruta + anio + "/" + mes + "/"
-    
-    subfolders = getSubfoldersNames(ruta)  # !!! Pensaría que esto hay que guardarlo en memoria como en RDIS para optimizar la carga de datos
-    
-    return JsonResponse({
-        "carpetas": subfolders
-    })

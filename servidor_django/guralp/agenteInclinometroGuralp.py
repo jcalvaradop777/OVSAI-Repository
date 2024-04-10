@@ -17,7 +17,7 @@ from plotly.subplots import make_subplots
 # ***************** Metodos de aquisicion de datos Guralp *****************
 
 # Obtiene todos los archivos de una carpeta
-def getFilesNames(self, subfolder_path):
+def getFilesNames(subfolder_path):
     file_names = []
     for file in os.listdir(subfolder_path):
         if os.path.isfile(os.path.join(subfolder_path, file)):
@@ -25,10 +25,10 @@ def getFilesNames(self, subfolder_path):
     return file_names
 
 # Obtiene todos los nombres de las subcarpetas de una carpeta
-def getSubfoldersNames(self, folder_path):
-    print("folder", folder_path)
+def getSubfoldersNames(folder_path):
     subfolder_names = next(os.walk(folder_path))[1]
     # subfolder_names.remove(".ipynb_checkpoints")
+    subfolder_names = {'subfolder_names': subfolder_names}
     return subfolder_names
 #________________
 
