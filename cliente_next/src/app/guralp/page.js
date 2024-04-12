@@ -12,11 +12,11 @@ export default function Pagina() {
   const [data, setData] = useState(null);
 
   const fetchData = async () => {
-    const response = await fetch("http://127.0.0.1:8000/api/data/"); // recibe a la URL los datos de las trazas y sus descomposition
+    const response = await fetch("http://127.0.0.1:8000/api/trazas/"); // recibe a la URL los datos de las trazas y sus descomposition
     const jsonData = await response.json();
-
-    console.log(jsonData);
     setData(jsonData);
+    console.log(`variable jsonData, ${data}`);  TOCA VER AQUI PORQUE NO LLEGAN LAS TRAZAS
+    console.log(`jsonData, ${jsonData}`);
   };
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function Pagina() {
 
   return (
     <div className="flex">
-      <SidebarTrazas />
+      <SidebarTrazas /> {/*esto es el lado izquierdo que obtiene los subfolders y los respectivos nombres de archivos */}
       <div className="flex-1">
         <div className="p-1">
           <Traza dx={data.idx} dy={data.valores} dtitulo={"Traza individual: " + data.titulo} />
