@@ -1,6 +1,6 @@
 {
-  "/guralp/page": "app/guralp/page.js",
   "/page": "app/page.js",
   "/volcan/page": "app/volcan/page.js",
+  "/guralp/page": "app/guralp/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js"
 }

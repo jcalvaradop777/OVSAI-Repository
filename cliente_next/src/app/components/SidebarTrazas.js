@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
-const SidebarTrazas = () => {
+const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro que recibe una funcion creada en la pagina de guralp que setea la variable "trazasRecibidas" con la información recibida desde Django y pueda grafiar las trazas en el lado derecho
 
   const [subfolders, setSubfolders] = useState(null);
   const [filesNames, setfilesNames] = useState(null);
-  const [trazas, setTrazas] = useState(null);
 
   const handleDateChange = (event) => { // función llamada en el onChange del imput Calenario cuando se selecciona una fecha
     fecha2Subfolders(event.target.value); // envía la fecha (event.target.value tiene la fecha seleccionada en el calendario)
@@ -83,9 +82,9 @@ const SidebarTrazas = () => {
         throw new Error('Error al procesar la solicitud');
       }
 
-      const data = await response.json(); // respuesta de django que trae los nombres de los archivos
-      setTrazas(data); 
-      console.log(`filesNames, ${ data }`);
+      const trazas = await response.json(); // respuesta de django que trae los nombres de los archivos
+      onEnviarDatos(trazas); // esta función es pasada como parametro a este componente, por aqui envío las trazas al lado derecho de la pagina
+      console.log(`trazas, ${ trazas }`);
 
     } catch (error) {
       console.error('Error en obtener los nombres de los archivos de los subfolders:', error);
