@@ -1,53 +1,54 @@
-import { useEffect, useRef, useState } from "react";
-import InputError from "../Inputs/Error";
+import { useState } from "react";
+import { ENV } from "@/config/env";
 
 // Componente/Formulario para crear emplazamiento
 export default function Emplazamiento({
-  _data,
-  _setData,
-  emplazamientos,
-  setE,
-  markers,
-  setMarkers,
-  setShow,
+  _Map,
+  _setMap,
   setSelected,
-  reload,
-  setReload
+  setShow,
 }) {
+  // Estado para guardar los datos del formulario
   const [data, setData] = useState({
     name: "",
-    lat: _data.lat,
-    long: _data.long,
+    lat: _Map._data.lat,
+    long: _Map._data.long,
     state: false,
   });
-  const latInput = useRef(null);
-  const longInput = useRef(null);
 
+  // Función para crear el emplazamiento al enviar el formulario
   const crear = (e) => {
     e.preventDefault();
 
     // Agregar a los emplazamientos
 
-    if (!_data.status)
-      _setData({
-        ..._data,
-        status: false,
+    if (data.name && _Map._data.lat && _Map._data.long && data.state) {
+      // Agregar emplazamiento a base de datos
+
+      fetch(ENV.URLBASE + "api/emplazamientos/create", {
+        method: "POST",
+        body: JSON.stringify({
+          name: data.name,
+          lat: _Map._data.lat,
+          long: _Map._data.long,
+          state: data.state,
+          type: 1,
+        }),
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       });
 
-    if (_data.name && _data.lat && _data.long && _data.status) {
-      setE([
-        {
-          ...data,
-          id: emplazamientos.length + 1,
-          lat: _data.lat || latInput.current.value,
-          long: _data.long || longInput.current.value,
-        },
-        ...emplazamientos,
-      ]);
+      // ---
 
-      setReload(true);
-      setSelected((value) => (value = 0));
-      _setData({});
+      _setMap({
+        ..._Map,
+        _data: {},
+        reload: true,
+      });
+      setSelected((value) => value = 0);
+      setData({}); // Borramos datos innecesarios
       setShow(false);
     } else {
       alert("Ha ocurrido un error al crear el emplazamiento");
@@ -56,65 +57,71 @@ export default function Emplazamiento({
 
   return (
     <form onSubmit={crear}>
-      <InputError
-        label={"name"}
-        textLabel={"Nombre emplazamiento"}
-        type={"text"}
-        placeholder={"Nombre emplazamiento"}
-        required
-        autoComplete={"off"}
-        _data={_data}
-        _setData={_setData}
-        Change={(e) => {
-          if (e.target.value.trim().length > 0) {
-            setData({
-              ...data,
-              name: e.target.value,
-            });
-          }
-        }}
-        message={"Debe llenar los campos vacios"}
-      />
-      <InputError
-        label={"lat"}
-        textLabel={"Latitud"}
-        type={"text"}
-        placeholder={"Latitud emplazamiento"}
-        required
-        autoComplete={"off"}
-        _data={_data}
-        _setData={_setData}
-        defaultValue={_data.lat || ""}
-        onChange={(e) => {
-          if (e.target.value.trim().length > 0) {
-            setData({
-              ...data,
-              lat: parseFloat(e.target.value),
-            });
-          }
-        }}
-        message={"Debe llenar los campos vacios"}
-      />
-      <InputError
-        label={"long"}
-        textLabel={"Longitud"}
-        type={"text"}
-        placeholder={"Longitud emplazamiento"}
-        required
-        autoComplete={"off"}
-        _data={_data}
-        _setData={_setData}
-        defaultValue={_data.long || ""}
-        onChange={(e) => {
-          if (e.target.value.trim().length > 0) {
-            setData({
-              ...data,
-              long: parseFloat(e.target.value),
-            });
-          }
-        }}
-        message={"Debe llenar los campos vacios"}
-      />
+      <label htmlFor="name">
+        <span className="block mb-2 text-sm font-medium text-gray-900">
+          Nombre emplazamiento
+        </span>
+        <input
+          type="text"
+          id="name"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+          placeholder="Nombre emplazamiento"
+          autoComplete={"off"}
+          onChange={(e) => {
+            if (e.target.value.trim().length > 0) {
+              setData({
+                ...data,
+                name: e.target.value,
+              });
+            }
+          }}
+          required
+        />
+      </label>
+      <label htmlFor="lat">
+        <span className="block mb-2 text-sm font-medium text-gray-900">
+          Latitud
+        </span>
+        <input
+          type="text"
+          id="lat"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+          placeholder="Latitud emplazamiento"
+          autoComplete={"off"}
+          defaultValue={_Map._data.lat || ""}
+          onChange={(e) => {
+            if (e.target.value.trim().length > 0) {
+              setData({
+                ...data,
+                lat: e.target.value,
+              });
+            }
+          }}
+          required
+        />
+      </label>
+      <label htmlFor="long">
+        <span className="block mb-2 text-sm font-medium text-gray-900">
+          Longitud
+        </span>
+        <input
+          type="text"
+          id="long"
+          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+          placeholder="Longitud emplazamiento"
+          autoComplete={"off"}
+          defaultValue={_Map._data.long || ""}
+          onChange={(e) => {
+            if (e.target.value.trim().length > 0) {
+              setData({
+                ...data,
+                long: e.target.value,
+              });
+            }
+          }}
+          required
+        />
+      </label>
       <label className="inline-flex items-center cursor-pointer">
         <input
           type="checkbox"
@@ -123,11 +130,6 @@ export default function Emplazamiento({
             setData({
               ...data,
               state: e.target.checked,
-            });
-
-            _setData({
-              ..._data,
-              status: true,
             });
           }}
         />
