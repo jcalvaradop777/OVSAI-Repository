@@ -3,10 +3,8 @@
 import {
   BuildingLibraryIcon,
   HomeIcon,
-  InboxIcon
+  InboxIcon,
 } from "@heroicons/react/20/solid";
-import Basic from "./Modals/Basic";
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 // Componentes
@@ -15,33 +13,27 @@ import Estacion from "./Forms/Estacion";
 import Sensor from "./Forms/Sensor";
 
 export default function Sidebar({
-  emplazamientos,
-  estaciones,
-  sensores,
-  setContent,
-  setTitle,
-  _setData,
-  _data,
+  Modal,
+  setModal,
+  _Map,
+  _setMap,
   selected,
   setSelected,
   setShow,
-  setE,
-  markers,
-  setMarkers,
-  _em,
-  _setEm,
-  reload,
-  setReload
 }) {
   const pathname = usePathname();
 
   const seleccionarHerramienta = (e) => {
     setShow(false);
     const valorSeleccionado = parseInt(e.target.getAttribute("data-type"));
-    if (valorSeleccionado !== selected) setSelected(valorSeleccionado); // Guardamos la herramienta seleccionada en un estado
-    if (valorSeleccionado === selected) setSelected(0); // Si vuelve a dar clic y es igual al valor guardado, se deselecciona
-    // Luego mostraremos una ventana modal para crear una de las herramientas
-    //openModal();
+    if (valorSeleccionado !== selected) {
+      // Guardamos la herramienta seleccionada en un estado
+      setSelected((value) => (value = valorSeleccionado));
+    }
+    if (valorSeleccionado === selected) {
+      // Si vuelve a dar clic y es igual al valor guardado, se deselecciona
+      setSelected((value) => (value = 0));
+    }
   };
 
   return (
@@ -70,21 +62,18 @@ export default function Sidebar({
                     onClick={(e) => {
                       seleccionarHerramienta(e);
                       // Mostramos el formulario para crear emplazamiento
-                      setContent(
-                        <Emplazamiento
-                          setSelected={setSelected}
-                          setShow={setShow}
-                          _data={_data}
-                          _setData={_setData}
-                          emplazamientos={emplazamientos}
-                          setE={setE}
-                          markers={markers}
-                          setMarkers={setMarkers}
-                          reload={reload}
-                          setReload={setReload}
-                        />
-                      );
-                      setTitle("Crear emplazamiento");
+                      setModal({
+                        ...Modal,
+                        title: "Crear emplazamiento",
+                        content: (
+                          <Emplazamiento                            
+                            _Map={_Map}
+                            _setMap={_setMap}
+                            setSelected={setSelected}
+                            setShow={setShow}
+                          />
+                        ),
+                      });
                     }}
                     title={"Crear emplazamiento"}
                     data-type="1"
@@ -94,7 +83,7 @@ export default function Sidebar({
                       data-type="1"
                     ></div>
                     <span style={{ color: "gray" }}>
-                      <BuildingLibraryIcon className="w-full h-auto" />                      
+                      <BuildingLibraryIcon className="w-full h-auto" />
                       <span className="text-black">Emplaza...</span>
                     </span>
                   </li>
@@ -107,10 +96,19 @@ export default function Sidebar({
                     onClick={(e) => {
                       seleccionarHerramienta(e);
                       // Mostramos el formulario para crear estación
-                      setContent(
-                        <Estacion _data={_data} _setData={_setData} />
-                      );
-                      setTitle("Crear estación");
+                      setModal({
+                        ...Modal,
+                        title: "Crear estación",
+                        content: (
+                          <Estacion
+                            emplazamiento={null}
+                            _Map={_Map}
+                            _setMap={_setMap}
+                            setSelected={setSelected}
+                            setShow={setShow}
+                          />
+                        ),
+                      });
                     }}
                     title={"Crear estación"}
                     data-type="2"
@@ -133,8 +131,18 @@ export default function Sidebar({
                     onClick={(e) => {
                       seleccionarHerramienta(e);
                       // Mostramos el formulario para crear sensor
-                      setContent(<Sensor _data={_data} _setData={_setData} />);
-                      setTitle("Crear sensor");
+                      setModal({
+                        ...Modal,
+                        title: "Crear sensor",
+                        content: (
+                          <Sensor
+                            _Map={_Map}
+                            _setMap={_setMap}
+                            setSelected={setSelected}
+                            setShow={setShow}
+                          />
+                        ),
+                      });
                     }}
                     title={"Crear sensor"}
                     data-type="3"
