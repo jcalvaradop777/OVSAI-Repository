@@ -1,14 +1,12 @@
 export default function Basic({
-  title,
-  content,
+  Modal,
+  setModal,
+  selected,
+  setSelected,
   show,
   setShow,
-  setSelected,
-  selected,
-  emplazamientos,
-  setE
 }) {
-
+  // La ventana modal solo se muestra si "show" es verdadero y se ha seleccionado una herramienta
   return show && selected !== 0 ? (
     <>
       <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
@@ -17,13 +15,13 @@ export default function Basic({
             className="relative p-2 block bg-slate-100 text-slate-800 rounded-tl-[inherit] rounded-tr-[inherit]"
             role="heading"
           >
-            {title}
+            {Modal.title}
           </section>
           <section
             role="main"
             className="p-2 relative block bg-slate-100 text-slate-800"
           >
-            {content}
+            {Modal.content}
           </section>
           <section
             role="footer"
@@ -33,8 +31,8 @@ export default function Basic({
               type="button"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               onClick={() => {
-                setSelected(value => value = 0);
-                setShow(false);                
+                setSelected((value) => (value = 0));
+                setShow(false);
               }}
             >
               Cerrar
