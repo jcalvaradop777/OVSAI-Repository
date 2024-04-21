@@ -3,6 +3,8 @@ import SidebarTrazas from "../SidebarTrazas";
 import Traza from "../Traza";
 import BoxPlot from "../BoxPlot";
 
+// Este componente es una ventana modal que muestra los datos de Guralp como trazas
+
 export default function VentanaGuralp({ mostrarVentana, setVentana }) {
   const [data, setData] = useState(null);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
