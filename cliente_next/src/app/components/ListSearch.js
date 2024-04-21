@@ -23,7 +23,7 @@ export default function ListSearch({ volcanes }) {
       </button>
       {show ? (
         <ul className="absolute p-0 ml-0 mt-0 bg-transparent box-border list-none">
-          {volcanes.map((volcan, i) => 
+          {volcanes.map((volcan, i) => (
             <a
               key={"volcanItem-" + i}
               href={"#14/" + volcan.lat + "/" + volcan.long}
@@ -33,7 +33,7 @@ export default function ListSearch({ volcanes }) {
                 {volcan.name}
               </li>
             </a>
-          )}
+          ))}
         </ul>
       ) : (
         <></>
