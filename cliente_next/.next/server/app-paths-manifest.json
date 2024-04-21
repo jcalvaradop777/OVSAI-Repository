@@ -1,6 +1,0 @@
-{
-  "/volcan/page": "app/volcan/page.js",
-  "/api/estaciones/create/route": "app/api/estaciones/create/route.js",
-  "/api/estaciones/get/route": "app/api/estaciones/get/route.js",
-  "/api/emplazamientos/get/route": "app/api/emplazamientos/get/route.js"
-}
