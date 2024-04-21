@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { FunnelIcon, HomeIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import Map from "../components/Map";
 import ListSearch from "../components/ListSearch";
 
@@ -11,7 +10,6 @@ import Guralp from "../guralp/page";
 import Basic from "../components/Modals/Basic";
 
 export default function Volcan() {
-  const [Loading, setLoading] = useState(true);
   const [volcanes] = useState([
     //  Volcanes de prueba para el mapa
     { name: "Volcán Galeras", lat: 1.2166666666667, long: -77.366666666667 },
@@ -19,34 +17,29 @@ export default function Volcan() {
     { name: "Volcán Cumbal", lat: 0.95583333333333, long: -77.883333333333 },
   ]);
 
-  const [show, setShow] = useState(false); // Muestra/Oculta la ventana modal para agregar una herramienta al mapa
-  const [title, setTitle] = useState(null);
-  const [content, setContent] = useState(null);
-
-  const [selected, setSelected] = useState(0); // Guarda elemento seleccionado
-  const [_data, _setData] = useState({}); // Manejar datos formulario
-  const [markers, setMarkers] = useState([]);
-
-  const [emplazamientos, setE] = useState([]); // Almacenar emplazamientos
-  const [estaciones, setES] = useState([]); // Almacenar estaciones
-  const [sensores, setS] = useState([]); // Almacenar sensores
-
-  const [_em, _setEm] = useState([]);
-  const [reload, setReload] = useState(true);
+  // Estado para manejar ventana modal de crear emplazamiento, estación y sensor
+  const [Modal, setModal] = useState({
+    title: null,
+    content: null,
+  });
+  // Estado para manejar la vista de ventana modal de crear emplazamiento, estación y sensor
+  const [show, setShow] = useState(false);
+  // Estado para manejar el menú de elementos/herramientas
+  const [selected, setSelected] = useState(0);
+  // Estado para manejar la configuración del mapa
+  const [_Map, _setMap] = useState({
+    _data: {},
+    markers: [],
+    reload: true,
+  });
 
   useEffect(() => {
-    if (Loading) {
-      setE([]);
-
-      setLoading(false);
-    }
-
     const adMap = document.querySelector(".maplibregl-control-container");
 
     if (adMap) {
       //adMap.remove();
     }
-  }, [_data, emplazamientos]);
+  }, [_Map]);
 
   const router = useRouter();
 
@@ -57,18 +50,14 @@ export default function Volcan() {
       case "/volcan":
         return (
           <Map
-            emplazamientos={emplazamientos}
-            setE={setE}
-            setShow={setShow}
-            _setData={_setData}
+            Modal={Modal}
+            setModal={setModal}
+            _Map={_Map}
+            _setMap={_setMap}
             selected={selected}
             setSelected={setSelected}
-            setContent={setContent}
-            _data={_data}
-            markers={markers}
-            setMarkers={setMarkers}
-            reload={reload}
-            setReload={setReload}
+            setShow={setShow}       
+            show={show}     
           />
         );
       case "/guralp":
@@ -81,33 +70,21 @@ export default function Volcan() {
     <>
       <div className="w-full h-full">
         <Basic
+          Modal={Modal}
+          setModal={setModal}
           show={show}
           setShow={setShow}
-          title={title}
-          content={content}
-          setSelected={setSelected}
           selected={selected}
-          emplazamientos={emplazamientos}
-          setE={setE}
+          setSelected={setSelected}
         />
         <Sidebar
-          emplazamientos={emplazamientos}
-          estaciones={estaciones}
-          sensores={sensores}
-          setContent={setContent}
+          Modal={Modal}
+          setModal={setModal}
+          _Map={_Map}
+          _setMap={_setMap}
           setShow={setShow}
-          setTitle={setTitle}
-          _setData={_setData}
-          _data={_data}
           selected={selected}
           setSelected={setSelected}
-          setE={setE}
-          markers={markers}
-          setMarkers={setMarkers}
-          _em={_em}
-          _setEm={_setEm}
-          reload={reload}
-          setReload={setReload}
         />
         <ListSearch volcanes={volcanes} />
         {getContent()}
