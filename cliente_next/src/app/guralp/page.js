@@ -9,35 +9,22 @@ import { useEffect, useState } from "react";
 
 export default function Pagina() {
 
-  const [data, setData] = useState(null);
+  const [trazasRecibidas, setTrzasRecibidas] = useState("");
 
-  const fetchData = async () => {
-    const response = await fetch("http://127.0.0.1:8000/api/data/"); // recibe a la URL los datos de las trazas y sus descomposition
-    const jsonData = await response.json();
-
-    console.log(jsonData);
-    setData(jsonData);
+  const handleRecibirDatos = (datos) => { // esta función es pasada como parametro (onEnviarDatos) al componente SidebarTrazas
+    setTrzasRecibidas(datos); // recibe la traza enviada por SidebarTrazas y la setea a la variable trazasRecibidas, que es utilizada abajo en los controloes graficos
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-
-  if (data == null) {
-    return <p>Cargando...</p>
-  }
 
   return (
     <div className="flex">
-      <SidebarTrazas />
+      <SidebarTrazas onEnviarDatos={handleRecibirDatos}/> {/*esto es el lado izquierdo que obtiene los subfolders y los respectivos nombres de archivos */}
       <div className="flex-1">
         <div className="p-1">
-          <Traza dx={data.idx} dy={data.valores} dtitulo={"Traza individual: " + data.titulo} />
-          <Traza dx={data.tiempo} dy={data.estacionalidad} dtitulo={"Componente estacional: " + data.titulo} />
-          <Traza dx={data.tiempo} dy={data.ruido} dtitulo={"Componente residual: " + data.titulo} />
-          <Traza dx={data.tiempo} dy={data.tendencia} dtitulo={"Tendencia: " + data.titulo} />
-          <BoxPlot dy={data.valores} dtitulo={"Box-plot: " + data.titulo} />
+          <Traza dx={trazasRecibidas.idx} dy={trazasRecibidas.valores} dtitulo={"Traza individual: " + trazasRecibidas.titulo} />
+          <Traza dx={trazasRecibidas.tiempo} dy={trazasRecibidas.estacionalidad} dtitulo={"Componente estacional: " + trazasRecibidas.titulo} />
+          <Traza dx={trazasRecibidas.tiempo} dy={trazasRecibidas.ruido} dtitulo={"Componente residual: " + trazasRecibidas.titulo} />
+          <Traza dx={trazasRecibidas.tiempo} dy={trazasRecibidas.tendencia} dtitulo={"Tendencia: " + trazasRecibidas.titulo} />
+          <BoxPlot dy={trazasRecibidas.valores} dtitulo={"Box-plot: " + trazasRecibidas.titulo} />
         </div>
       </div>
     </div>
