@@ -15,6 +15,7 @@
     "axios": "^1.6.8",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
+    "mongoose": "^8.3.2",
     "next": "14.1.2",
     "plotly.js": "^2.30.0",
     "react": "^18",
