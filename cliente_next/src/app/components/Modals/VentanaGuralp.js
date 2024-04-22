@@ -1,29 +1,10 @@
-import { useEffect, useState } from "react";
-import SidebarTrazas from "../SidebarTrazas";
-import Traza from "../Traza";
-import BoxPlot from "../BoxPlot";
+import {useState } from "react";
+import RenderTrazaGuralp from "@/app/guralp/page";
 
 // Este componente es una ventana modal que muestra los datos de Guralp como trazas
 
 export default function VentanaGuralp({ mostrarVentana, setVentana }) {
-  const [data, setData] = useState(null);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
-
-  const fetchData = async () => {
-    const response = await fetch("http://127.0.0.1:8000/api/data/"); // recibe a la URL los datos de las trazas y sus descomposition
-    const jsonData = await response.json();
-
-    console.log(jsonData);
-    setData(jsonData);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  if (data == null) {
-    return <p>Cargando...</p>;
-  }
 
   return (
     <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
@@ -54,35 +35,7 @@ export default function VentanaGuralp({ mostrarVentana, setVentana }) {
           className="p-2 relative block bg-slate-100 text-slate-800"
         >
           <div className="flex">
-            <SidebarTrazas />
-            <div className="flex-1">
-              <div className="p-1">
-                <Traza
-                  dx={data.idx}
-                  dy={data.valores}
-                  dtitulo={"Traza individual: " + data.titulo}
-                />
-                <Traza
-                  dx={data.tiempo}
-                  dy={data.estacionalidad}
-                  dtitulo={"Componente estacional: " + data.titulo}
-                />
-                <Traza
-                  dx={data.tiempo}
-                  dy={data.ruido}
-                  dtitulo={"Componente residual: " + data.titulo}
-                />
-                <Traza
-                  dx={data.tiempo}
-                  dy={data.tendencia}
-                  dtitulo={"Tendencia: " + data.titulo}
-                />
-                <BoxPlot
-                  dy={data.valores}
-                  dtitulo={"Box-plot: " + data.titulo}
-                />
-              </div>
-            </div>
+            <RenderTrazaGuralp /> 
           </div>
         </section>
         <section

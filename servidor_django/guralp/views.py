@@ -1,29 +1,99 @@
 from django.http import JsonResponse
-from .agenteInclinometroGuralp import openGcf, graficaOriginal, getFigurasUnaTraza, getFigVariasTrazasUnificadas, getSubfoldersNames
+from .agenteInclinometroGuralp import openGcf, graficaOriginal, getFigurasUnaTraza, getFigVariasTrazasUnificadas, getSubfoldersNames, getFilesNames
 #import agenteInclinometroGuralp as agenteIncGur
 from django.shortcuts import render
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from flask import Flask, request
-from flask_cors import CORS
+rutaGcf = ""
+rutaGcfFecha = ""
+rutaGcfFechaSubfolder = ""
+rutaGcfFechaSubfolderFile = ""
 
-app = Flask(__name__)
-
-@app.route('/api/procesar_fecha/', methods=['POST'])
-def procesar_fecha(request):
-    data = request.json
-    selected_date = data['selectedDate']
-    # Procesa la fecha como desees
-    print(selected_date)
-    # Devuelve una respuesta si es necesario
-    return {'message': 'Fecha procesada correctamente'}
-
+@csrf_exempt
+def fecha2Subfolders(request):
+    global rutaGcf
+    global rutaGcfFecha
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            rutaGcf = "D:/SGC/GCF/" # CREO QUE ESTA RUTA DEBE OBTNERSE DE UNA BD ASOCIADA A LA ESTACIÓN EN REFERENCIA
+            partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
+            anio = partes[0]
+            mes = partes[1]
+            rutaGcfFecha = rutaGcf + anio + "/" + mes + "/"
+            subfoldersNames = getSubfoldersNames(rutaGcfFecha)
+            #print("subfolder_names: ", subfoldersNames)
+            return JsonResponse(subfoldersNames)
+        except json.JSONDecodeError:
+            pass
+    else:
+        subfoldersNames={'message': 'Fecha procesada, NO POST...'}
+        return JsonResponse(subfoldersNames)
+        #raise Http404()
+        
+@csrf_exempt
+def nombresArchivos(request):
+    global rutaGcfFecha
+    global rutaGcfFechaSubfolder
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            subfolder = data.get('selectedSubfolder')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            rutaGcfFechaSubfolder = rutaGcfFecha + subfolder + "/"
+            filesNames = getFilesNames(rutaGcfFechaSubfolder)
+            #print("Archivos: ", filesNames)
+            return JsonResponse(filesNames)
+        except json.JSONDecodeError:
+            pass
+    else:
+        nopost={'message': 'Nombres de archivos, NO POST...'}
+        return JsonResponse(nopost)
+    
+@csrf_exempt
+def trazasANTERIOR(request):
+    global rutaGcfFechaSubfolder
+    global rutaGcfFechaSubfolderFile
+    if request.method == 'POST': 
+        try:
+            data = json.loads(request.body)
+            fileName = data.get('fileName')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            rutaGcfFechaSubfolderFile = rutaGcfFechaSubfolder + fileName
+            print("rutaGcfFechaSubfolderFile ", rutaGcfFechaSubfolderFile)
+            dataTrazas = openGcf(rutaGcfFechaSubfolderFile)
+            #print("dataTrazas ", dataTrazas)
+            return JsonResponse(dataTrazas)  
+        except json.JSONDecodeError: 
+            pass
+    else:
+        nopost={'message': 'Trazas generadas, NO POST...'}
+        return JsonResponse(nopost)  
+    
+    
+@csrf_exempt
 def trazas(request):
-    archivoGcf = "04010000.gcf"
-    data = openGcf(archivoGcf)
-    return JsonResponse(data)
+    global rutaGcfFechaSubfolder
+    global rutaGcfFechaSubfolderFile
+    if request.method == 'POST': 
+        try:
+            data = json.loads(request.body)
+            fileNamesSelected = data.get('fileNamesSelected')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            print("fileNamesSelected: ", fileNamesSelected)
+            listaDataTrazas = []
+            for fileName in fileNamesSelected:
+                rutaGcfFechaSubfolderFile = rutaGcfFechaSubfolder + fileName
+                print("rutaGcfFechaSubfolderFile ", rutaGcfFechaSubfolderFile)
+                dataTrazas = openGcf(rutaGcfFechaSubfolderFile)
+                listaDataTrazas.append(dataTrazas)
+            #print("dataTrazas ", dataTrazas)
+            return JsonResponse(listaDataTrazas, safe=False) 
+        except json.JSONDecodeError: 
+            pass
+    else:
+        nopost={'message': 'Trazas generadas, NO POST...'}
+        return JsonResponse(nopost)
  
 #__________________________________________________________________
 
@@ -107,25 +177,3 @@ async def chat(request):
     # await agChat.start(auto_register=True)
 
     return render(request, 'chat.html')
-
-@csrf_exempt
-def list_folders(request):
-    
-    ruta = "D:/SGC/GCF/"
-    #ruta = "X:/"
-    
-    if request.method != 'POST':
-        raise Http404()
-    data = json.loads(request.body)
-    fecha = data.get('fecha')
-
-    partes = fecha.split("-")  # Divide la cadena en partes usando el guion como separador
-    anio = partes[0]
-    mes = partes[1]
-    ruta = ruta + anio + "/" + mes + "/"
-    
-    subfolders = getSubfoldersNames(ruta)  # !!! Pensaría que esto hay que guardarlo en memoria como en RDIS para optimizar la carga de datos
-    
-    return JsonResponse({
-        "carpetas": subfolders
-    })

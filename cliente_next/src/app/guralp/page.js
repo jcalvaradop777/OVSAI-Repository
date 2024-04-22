@@ -8,7 +8,7 @@ import BoxPlot from '../components/BoxPlot';
 import SidebarTrazas from '../components/SidebarTrazas';
 import { useEffect, useState } from "react";
 
-export default function Pagina() {
+export default function RenderTrazaGuralp() {
 
   const [trazasRecibidas, setTrzasRecibidas] = useState("");
 
