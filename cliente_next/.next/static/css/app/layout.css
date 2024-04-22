@@ -693,6 +693,12 @@ video {
 .mt-2 {
   margin-top: 0.5rem;
 }
+.mt-4 {
+  margin-top: 1rem;
+}
+.mt-8 {
+  margin-top: 2rem;
+}
 .box-border {
   box-sizing: border-box;
 }
@@ -785,6 +791,9 @@ video {
 }
 .items-center {
   align-items: center;
+}
+.justify-center {
+  justify-content: center;
 }
 .justify-between {
   justify-content: space-between;
@@ -984,6 +993,10 @@ video {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 .font-bold {
   font-weight: 700;
