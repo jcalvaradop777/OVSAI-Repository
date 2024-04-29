@@ -1,4 +1,4 @@
-// File: P:\jcalvaradop\2024\softwareOVSAI\OVSAI-Repository\cliente_next\src\app\layout.js
+// File: D:\Volcan-Project\OVSAI-Repository\cliente_next\src\app\layout.js
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
