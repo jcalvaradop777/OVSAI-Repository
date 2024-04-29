@@ -52,7 +52,7 @@ export default function MenuContext({
           className="cursor-pointer select-none p-2 rounded-md"
           onClick={abrirTrazas}
         >
-          Trazas
+          Gráficas
         </li>
         <li className="cursor-pointer select-none p-2 rounded-md">
           Habilitar/Deshabilitar
