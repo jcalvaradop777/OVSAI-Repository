@@ -21,7 +21,8 @@ export default function Map({
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const tokyo = { lng: 139.753, lat: 35.6844 };
+  // const tokyo = { lng: 139.753, lat: 35.6844 };
+  const tokyo = { lng: -77.253837, lat: 1.209139 };  // posición del observatorio vulcanológico de Pasto
   const [Mposition, setMposition] = useState({
     x: 0,
     y: 0,
