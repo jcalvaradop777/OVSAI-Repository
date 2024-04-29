@@ -96,7 +96,7 @@ const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro 
       // trazasObox es una variable envida a lado dererecho por la función onEnviarDatos que permite dibujar las trazas o los boxPolts
 
     } catch (error) {
-      console.error('Error en obtener los nombres de los archivos de los subfolders:', error); 
+      console.error('Error en obtener los nombres de los archivos de los subfolders:', error);
     }
   };
 
@@ -104,7 +104,7 @@ const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro 
 
     <div className="relative flex flex-col bg-clip-border bg-gray-200 text-gray-700 h-[calc(100vh)] w-full max-w-[15rem] p-4 shadow-xl shadow-blue-gray-900/5 z-50">
 
-      <div className="flex items-center justify-center bg-[#82A53D]">
+      <div className="flex items-center justify-center bg-[#9FBC2E]">
         <h2 className="text-2xl font-bold text-white mt-8 mb-8">Gráficas</h2>
       </div>
 
@@ -177,6 +177,34 @@ const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro 
               ) : (
                 <p>-----</p>
               )}
+            </div>
+          </li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>
+          <span>Entrenamiento:</span>
+        </summary>
+        <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
+          <li>
+            <div>
+              <select>
+                <option value="sin_dato">Sin dato</option>
+                <option value="intermitente">intermitente</option>
+                <option value="nulo">nulo</option>
+                <option value="atipico">atípico</option>
+              </select>
+            </div>
+          </li>
+          <li>
+            <div>
+              <button
+                type="button"
+                className="text-white bg-[#82A53D] hover:bg-[#C4D92E] hover:text-[#8A8C8E] focus:ring-4 focus:text-white focus:ring-red-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+              >
+                Etiquetar
+              </button>
             </div>
           </li>
         </ul>

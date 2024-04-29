@@ -19,7 +19,8 @@ def fecha2Subfolders(request):
         try:
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
-            rutaGcf = "D:/SGC/GCF/" # CREO QUE ESTA RUTA DEBE OBTNERSE DE UNA BD ASOCIADA A LA ESTACIÓN EN REFERENCIA
+            #rutaGcf = "D:/SGC/GCF/" # CREO QUE ESTA RUTA DEBE OBTNERSE DE UNA BD ASOCIADA A LA ESTACIÓN EN REFERENCIA
+            rutaGcf = "X:/"
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]
@@ -52,26 +53,7 @@ def nombresArchivos(request):
         nopost={'message': 'Nombres de archivos, NO POST...'}
         return JsonResponse(nopost)
     
-@csrf_exempt
-def trazasANTERIOR(request):
-    global rutaGcfFechaSubfolder
-    global rutaGcfFechaSubfolderFile
-    if request.method == 'POST': 
-        try:
-            data = json.loads(request.body)
-            fileName = data.get('fileName')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
-            rutaGcfFechaSubfolderFile = rutaGcfFechaSubfolder + fileName
-            print("rutaGcfFechaSubfolderFile ", rutaGcfFechaSubfolderFile)
-            dataTrazas = openGcf(rutaGcfFechaSubfolderFile)
-            #print("dataTrazas ", dataTrazas)
-            return JsonResponse(dataTrazas)  
-        except json.JSONDecodeError: 
-            pass
-    else:
-        nopost={'message': 'Trazas generadas, NO POST...'}
-        return JsonResponse(nopost)  
-    
-    
+
 @csrf_exempt
 def trazas(request):
     global rutaGcfFechaSubfolder

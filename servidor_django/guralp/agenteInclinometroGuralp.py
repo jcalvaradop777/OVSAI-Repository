@@ -22,6 +22,7 @@ def getFilesNames(subfolder_path):
     for file in os.listdir(subfolder_path):
         if os.path.isfile(os.path.join(subfolder_path, file)):
             file_names.append(file)
+    file_names.sort()
     file_names = {'file_names': file_names}
     return file_names
 
