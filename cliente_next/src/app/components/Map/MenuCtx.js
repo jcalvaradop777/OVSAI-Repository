@@ -158,9 +158,11 @@ export default function MenuContext({
         ) : (
           <></>
         )}
+
         <li className="cursor-pointer select-none p-2 rounded-md">
           Agregar sensor
         </li>
+        
       </ul>
       {mostrarVentana ? (
         <VentanaGuralp
