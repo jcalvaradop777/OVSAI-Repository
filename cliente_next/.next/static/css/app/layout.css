@@ -644,17 +644,21 @@ video {
 .m-0 {
   margin: 0px;
 }
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
 .mb-10 {
   margin-bottom: 2.5rem;
 }
 .mb-2 {
   margin-bottom: 0.5rem;
 }
-.mb-4 {
-  margin-bottom: 1rem;
-}
 .mb-6 {
   margin-bottom: 1.5rem;
+}
+.mb-8 {
+  margin-bottom: 2rem;
 }
 .me-2 {
   margin-inline-end: 0.5rem;
@@ -680,6 +684,9 @@ video {
 .mt-2 {
   margin-top: 0.5rem;
 }
+.mt-8 {
+  margin-top: 2rem;
+}
 .box-border {
   box-sizing: border-box;
 }
@@ -694,6 +701,9 @@ video {
 }
 .inline-flex {
   display: inline-flex;
+}
+.table {
+  display: table;
 }
 .grid {
   display: grid;
@@ -722,6 +732,9 @@ video {
 .w-11 {
   width: 2.75rem;
 }
+.w-64 {
+  width: 16rem;
+}
 .w-auto {
   width: auto;
 }
@@ -732,17 +745,33 @@ video {
   width: -moz-max-content;
   width: max-content;
 }
+.w-80 {
+  width: 20rem;
+}
 .min-w-44 {
   min-width: 11rem;
 }
 .min-w-\[240px\] {
   min-width: 240px;
 }
+.min-w-60 {
+  min-width: 15rem;
+}
+.max-w-\[15rem\] {
+  max-width: 15rem;
+}
 .max-w-\[20rem\] {
   max-width: 20rem;
 }
 .max-w-sm {
   max-width: 24rem;
+}
+.max-w-max {
+  max-width: -moz-max-content;
+  max-width: max-content;
+}
+.max-w-80 {
+  max-width: 20rem;
 }
 .flex-1 {
   flex: 1 1 0%;
@@ -769,6 +798,9 @@ video {
 }
 .items-center {
   align-items: center;
+}
+.justify-center {
+  justify-content: center;
 }
 .justify-between {
   justify-content: space-between;
@@ -834,6 +866,10 @@ video {
   --tw-border-opacity: 1;
   border-color: rgb(15 23 42 / var(--tw-border-opacity));
 }
+.bg-\[\#82A53D\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(130 165 61 / var(--tw-bg-opacity));
+}
 .bg-\[rgba\(0\2c 0\2c 0\2c 0\.5\)\] {
   background-color: rgba(0,0,0,0.5);
 }
@@ -848,6 +884,10 @@ video {
 .bg-gray-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(229 231 235 / var(--tw-bg-opacity));
+}
+.bg-gray-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(156 163 175 / var(--tw-bg-opacity));
 }
 .bg-gray-50 {
   --tw-bg-opacity: 1;
@@ -921,6 +961,10 @@ video {
 }
 .font-sans {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 .text-base {
   font-size: 1rem;

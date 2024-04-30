@@ -1,6 +1,6 @@
 {
-  "/api/emplazamientos/create/route": "app/api/emplazamientos/create/route.js",
-  "/api/estaciones/get/route": "app/api/estaciones/get/route.js",
   "/volcan/page": "app/volcan/page.js",
-  "/api/emplazamientos/get/route": "app/api/emplazamientos/get/route.js"
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/api/emplazamientos/get/route": "app/api/emplazamientos/get/route.js",
+  "/api/estaciones/get/route": "app/api/estaciones/get/route.js"
 }
