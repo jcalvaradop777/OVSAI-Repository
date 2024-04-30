@@ -11,10 +11,10 @@ export default function Estacion({
 }) {
   const [data, setData] = useState({
     name: "",
-    _emplazamiento: emplazamiento ? emplazamiento._id : "",
+    _emplazamiento: emplazamiento ? emplazamiento.id : null,
     state: false,
-    lat: _Map._data.lat,
-    long: _Map._data.long,
+    latitude: _Map._data.lat,
+    longitude: _Map._data.long,
   });
 
   const crear = (e) => {
@@ -28,10 +28,9 @@ export default function Estacion({
         body: JSON.stringify({
           name: data.name,
           emplazamiento: data._emplazamiento,
-          state: data.state,
           type: 2,
-          lat: _Map._data.lat,
-          long: _Map._data.long,
+          latitude: _Map._data.lat,
+          longitude: _Map._data.long,
         }),
         headers: {
           Accept: "application/json",

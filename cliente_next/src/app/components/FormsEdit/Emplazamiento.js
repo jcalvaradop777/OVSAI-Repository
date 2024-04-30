@@ -1,60 +1,20 @@
 import { useState } from "react";
-import { ENV } from "@/config/env";
 
-// Componente/Formulario para crear emplazamiento
-export default function Emplazamiento({
-  _Map,
-  _setMap,
-  setSelected,
-  setShow,
+export default function EmplazamientoEdit({
+    data
 }) {
-  // Estado para guardar los datos del formulario
-  const [data, setData] = useState({
-    name: "",
-    lat: _Map._data.lat,
-    long: _Map._data.long,
-  });
+    const [data, setData] = useState({
+        name: "",
+        latitud: "",
+        longitud: ""
+    })
 
-  // Función para crear el emplazamiento al enviar el formulario
-  const crear = (e) => {
-    e.preventDefault();
+    const enviarDatos = () => {
 
-    // Agregar a los emplazamientos
-
-    if (data.name && _Map._data.lat && _Map._data.long) {
-      // Agregar emplazamiento a base de datos
-
-      fetch(ENV.URLBASE + "api/emplazamientos/create", {
-        method: "POST",
-        body: JSON.stringify({
-          name: data.name,
-          latitude: _Map._data.lat + "",
-          longitude: _Map._data.long + "",
-          type: 1,
-        }),
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      // ---
-
-      _setMap({
-        ..._Map,
-        _data: {},
-        reload: true,
-      });
-      setSelected((value) => value = 0);
-      setData({}); // Borramos datos innecesarios
-      setShow(false);
-    } else {
-      alert("Ha ocurrido un error al crear el emplazamiento");
     }
-  };
 
-  return (
-    <form onSubmit={crear}>
+    return (
+        <form onSubmit={enviarDatos}>
       <label htmlFor="name">
         <span className="block mb-2 text-sm font-medium text-gray-900">
           Nombre emplazamiento
@@ -65,13 +25,12 @@ export default function Emplazamiento({
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
           placeholder="Nombre emplazamiento"
           autoComplete={"off"}
+          value={data.name}
           onChange={(e) => {
-            if (e.target.value.trim().length > 0) {
-              setData({
+            setData({
                 ...data,
-                name: e.target.value,
-              });
-            }
+                name: e.target.value
+            })
           }}
           required
         />
@@ -86,14 +45,12 @@ export default function Emplazamiento({
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
           placeholder="Latitud emplazamiento"
           autoComplete={"off"}
-          defaultValue={_Map._data.lat || ""}
+          value={data.latitud}
           onChange={(e) => {
-            if (e.target.value.trim().length > 0) {
-              setData({
+            setData({
                 ...data,
-                lat: e.target.value,
-              });
-            }
+                latitud: e.target.value
+            })
           }}
           required
         />
@@ -108,18 +65,16 @@ export default function Emplazamiento({
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
           placeholder="Longitud emplazamiento"
           autoComplete={"off"}
-          defaultValue={_Map._data.long || ""}
+          value={data.longitud}
           onChange={(e) => {
-            if (e.target.value.trim().length > 0) {
-              setData({
+            setData({
                 ...data,
-                long: e.target.value,
-              });
-            }
+                longitud: e.target.value
+            })
           }}
           required
         />
-      </label>
+      </label>      
       <div className="block mt-2">
         <button
           type="submit"
@@ -129,5 +84,5 @@ export default function Emplazamiento({
         </button>
       </div>
     </form>
-  );
+    )
 }

@@ -1,17 +1,29 @@
-import { connectDB } from "@/app/db/mongo";
-import Estacion from "@/app/db/schemes/Estacion";
+import { initTables } from "@/app/db/tables/initTables";
+import { insertDataIntoTable } from "@/app/db/tables/insert";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
-  await connectDB();
-  const data = await req.json();
-  console.log(data);
+  // Iniciamos las base de datos
+  // Solo si no están creadas, de lo contrario es para asegurarse
+  await initTables();
+
   try {
-    const nuevaEstacion = new Estacion(data);
-    const estacionGuardada = await nuevaEstacion.save();
+    const data = await req.json();
+
+    if (data.emplazamiento === null) {
+      delete data.emplazamiento;
+    }
+
+    const names = Object.keys(data);
+    const values = Object.values(data);
+
+    console.log(data);
+
+    await insertDataIntoTable("estaciones", names, values);
+
     return NextResponse.json({
       success: true,
-      estacionGuardada,
+      message: "La estación se ha creado correctamente!",
     });
   } catch (error) {
     return NextResponse.json({

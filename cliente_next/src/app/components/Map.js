@@ -22,7 +22,7 @@ export default function Map({
   const mapContainer = useRef(null);
   const map = useRef(null);
   // const tokyo = { lng: 139.753, lat: 35.6844 };
-  const tokyo = { lng: -77.253837, lat: 1.209139 };  // posición del observatorio vulcanológico de Pasto
+  const tokyo = { lng: -77.253837, lat: 1.209139 }; // posición del observatorio vulcanológico de Pasto
   const [Mposition, setMposition] = useState({
     x: 0,
     y: 0,
@@ -126,11 +126,11 @@ export default function Map({
                   el.style.padding = "5px";
 
                   const marker = new maptilersdk.Marker({ element: el })
-                    .setLngLat([mark.long, mark.lat])
+                    .setLngLat([mark.longitude, mark.latitude])
                     .setPopup(
                       new maptilersdk.Popup().setHTML(`
                   Nombre: ${mark.name}<br>
-                  Posición: [lng: ${mark.long}, lat: ${mark.lat}]          
+                  Posición: [lng: ${mark.longitude}, lat: ${mark.latitude}]          
                   `)
                     )
                     .addTo(map.current);
@@ -179,7 +179,7 @@ export default function Map({
             if (Array.isArray(res)) {
               if (res.length > 0) {
                 res.forEach((mark) => {
-                  if (mark.long && mark.lat) {
+                  if (mark.longitude && mark.latitude) {
                     // Creamos marcador para insertar en mapa
                     // Crear función para agregar imagen al marcador
 
@@ -191,11 +191,11 @@ export default function Map({
                     el.style.padding = "5px";
 
                     const marker = new maptilersdk.Marker({ element: el })
-                      .setLngLat([mark.long, mark.lat])
+                      .setLngLat([mark.longitude, mark.latitude])
                       .setPopup(
                         new maptilersdk.Popup().setHTML(`
                 Nombre: ${mark.name}<br>
-                Posición: [lng: ${mark.long}, lat: ${mark.lat}]          
+                Posición: [lng: ${mark.longitude}, lat: ${mark.latitude}]          
                 `)
                       )
                       .addTo(map.current);
@@ -215,7 +215,7 @@ export default function Map({
                         x: x,
                         y: y,
                         visible: true,
-                        element: mark.type === 1 ? mark : null,
+                        element: mark.type >= 1 ? mark : null,
                       });
                     });
                     // ---
@@ -282,6 +282,14 @@ export default function Map({
     // ---
 
     if (map.current) {
+      /* window.addEventListener("click", () => {
+        setMposition({
+          ...Mposition,
+          visible: false,
+          element: null,
+        });
+      }) */
+
       map.current.on("click", (e) => {
         // Desactivar el menú o contextMenu de los marcadores
         setMposition({
