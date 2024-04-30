@@ -13,6 +13,7 @@ import os
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import statistics
 
 # ***************** Metodos de aquisicion de datos Guralp *****************
 
@@ -33,6 +34,40 @@ def getSubfoldersNames(folder_path):
         subfolder_names.remove(".ipynb_checkpoints")
     subfolder_names = {'subfolder_names': subfolder_names}
     return subfolder_names
+
+def getAnomalias(folderFecha_path):
+    
+    subfolder_names = next(os.walk(folderFecha_path))[1]
+    if ".ipynb_checkpoints" in subfolder_names:
+        subfolder_names.remove(".ipynb_checkpoints")
+    
+    senal0 = []
+    saltos = []
+    
+    for subfolder in subfolder_names:
+        subfolder_path = folderFecha_path + subfolder + "/"
+        file_names = getFilesNames(subfolder_path)
+        
+        for file in file_names['file_names']:
+            
+             file_path = subfolder_path + file
+             datosGcf = openGcf(file_path)
+             #print("datosGcf['tendencia']: ", datosGcf['tendencia'])
+             
+             promedio_tendencia = statistics.mean(datosGcf['tendencia'])
+             #print("promedio_tendencia: ", promedio_tendencia)
+             if promedio_tendencia < 0.5:
+                 #print("senal0 file: ", file)
+                 senal0.append(file)
+                 
+             desviacion_estandar = statistics.stdev(datosGcf['tendencia'])
+             #print("desviacion_estandar: ", desviacion_estandar)
+             if desviacion_estandar > 0.3:
+                 #print("saltos file: ", file)
+                 saltos.append(file)
+          
+    datosAnomalos = {'senal0': senal0, 'saltos': saltos}
+    return datosAnomalos
 #________________
 
 # Extrae los datos de la grafica con GCF2ASC.EXE

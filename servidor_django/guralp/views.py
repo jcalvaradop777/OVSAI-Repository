@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from .agenteInclinometroGuralp import openGcf, graficaOriginal, getFigurasUnaTraza, getFigVariasTrazasUnificadas, getSubfoldersNames, getFilesNames
+from .agenteInclinometroGuralp import openGcf, graficaOriginal, getFigurasUnaTraza, getFigVariasTrazasUnificadas, getSubfoldersNames, getFilesNames, getAnomalias
 #import agenteInclinometroGuralp as agenteIncGur
 from django.shortcuts import render
 from django.http import Http404
@@ -19,8 +19,8 @@ def fecha2Subfolders(request):
         try:
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
-            #rutaGcf = "D:/SGC/GCF/" # CREO QUE ESTA RUTA DEBE OBTNERSE DE UNA BD ASOCIADA A LA ESTACIÓN EN REFERENCIA
-            rutaGcf = "X:/"
+            rutaGcf = "D:/SGC/GCF/" # Ruta local
+            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]
@@ -76,6 +76,28 @@ def trazas(request):
     else:
         nopost={'message': 'Trazas generadas, NO POST...'}
         return JsonResponse(nopost)
+    
+@csrf_exempt
+def anomalias(request): 
+
+    if request.method == 'POST': 
+        try:
+            data = json.loads(request.body)
+            selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            
+            rutaGcf = "D:/SGC/GCF/" # Ruta local
+            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
+            partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
+            anio = partes[0]
+            mes = partes[1]
+            rutaGcfFecha = rutaGcf + anio + "/" + mes + "/"
+            anomalias = getAnomalias(rutaGcfFecha)
+            return JsonResponse(anomalias, safe=False) 
+        except json.JSONDecodeError: 
+            pass
+    else:
+        nopost={'message': 'Anomalías generadas, NO POST...'}
+        return JsonResponse(nopost)
  
 #__________________________________________________________________
 
@@ -92,10 +114,6 @@ def trazaIndependiente(request):
     fig = graficaOriginal(datos, titulo)
     trazaHtml = fig.to_html(full_html=False)
     trz = {'traza': trazaHtml}
-    
-    
-    # CREO QUE TOCA UTILIZAR ESTE METODO  getFigUnaTraza
-    # Y UNIR VARIAS FIGURAS
     
     return render(request, 'index.html', trz)
 

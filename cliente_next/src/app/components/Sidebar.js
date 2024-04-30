@@ -170,8 +170,19 @@ export default function Sidebar({
               Volcan
             </Link>
           )}
-          
+
         </nav>
+
+        {/* para llamar rapidamente a una pagina y hacer pruebas */}
+        <div className="flex items-center justify-center">
+          <Link
+            href={"/anomalias"}
+            className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+          >
+            Anomalias
+          </Link>
+        </div>
+
       </div>
     </>
   );
