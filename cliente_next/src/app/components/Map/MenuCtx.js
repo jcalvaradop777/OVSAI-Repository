@@ -115,7 +115,7 @@ export default function MenuContext({
           className="cursor-pointer select-none p-2 rounded-md"
           onClick={abrirTrazas}
         >
-          Gráficas
+          Entrenar
         </li>
         {console.log(Mposition.element.type)}
         {Mposition.element.type === 1 ? (
