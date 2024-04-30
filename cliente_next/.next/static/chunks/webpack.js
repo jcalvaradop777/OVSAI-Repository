@@ -192,7 +192,11 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
+<<<<<<< HEAD
 /******/ 		__webpack_require__.h = function() { return "90b957c6b0244aec"; }
+=======
+/******/ 		__webpack_require__.h = function() { return "4e15ad5e41abd9fe"; }
+>>>>>>> mainTrazasBD
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */

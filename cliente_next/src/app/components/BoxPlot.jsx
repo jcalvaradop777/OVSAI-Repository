@@ -21,7 +21,7 @@ export default function BoxPlot({dy, dtitulo}) {
               template: 'plotly_white'
             },
           ]}
-          layout={{ width: 500, height: 400, title: dtitulo }}
+          layout={{ width: 1000, height: 700, title: dtitulo }}
         />
     </div>
   );

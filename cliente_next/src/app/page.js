@@ -19,8 +19,6 @@ export default function Home() {
         return (
           <Volcan />
         );
-      case "/guralp":
-        return <Guralp />;
       default:
         return <h1>No encontrado</h1>;
     }

@@ -130,7 +130,11 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	(() => {
+<<<<<<< HEAD
 /******/ 		__webpack_require__.h = () => ("b69eedc44f83f660")
+=======
+/******/ 		__webpack_require__.h = () => ("4e88bde57370794e")
+>>>>>>> mainTrazasBD
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
