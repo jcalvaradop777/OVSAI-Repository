@@ -1,0 +1,7 @@
+table, th, td {
+    @apply border-[1px] border-slate-600 border-collapse;
+}
+
+th, td {
+    @apply p-2;
+}

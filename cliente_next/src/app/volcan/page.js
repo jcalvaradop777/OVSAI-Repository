@@ -57,7 +57,7 @@ export default function Volcan() {
             selected={selected}
             setSelected={setSelected}
             setShow={setShow}       
-            show={show}     
+            show={show}   
           />
         );
       case "/guralp":
