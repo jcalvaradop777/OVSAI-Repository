@@ -7,11 +7,9 @@ import {
 } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-// Componentes
-import Emplazamiento from "./Forms/Emplazamiento";
-import Estacion from "./Forms/Estacion";
-import Sensor from "./Forms/Sensor";
 
+// Componentes
+import Estacion from "./Estaciones/FrmIngresarEstacion";
 export default function Sidebar({
   Modal,
   setModal,
@@ -53,45 +51,14 @@ export default function Sidebar({
         <nav className="flex flex-col gap-1 min-w-[240px] p-2 font-sans text-base font-normal text-gray-700">
           {pathname === "/volcan" ? (
             <>
-              {/* Emplazamientos, estaciones y sensores */}
+              {/* Estaciones*/}
               <details>
                 <summary>
-                  <span>Emplazamientos</span>
+                  <span>Estaciones</span>
                 </summary>
                 <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
-                  <li
-                    className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${selected === 1
-                      ? "border-solid border-2 border-slate-900"
-                      : ""
-                      }`}
-                    onClick={(e) => {
-                      seleccionarHerramienta(e);
-                      // Mostramos el formulario para crear emplazamiento
-                      setModal({
-                        ...Modal,
-                        title: "Crear emplazamiento",
-                        content: (
-                          <Emplazamiento
-                            _Map={_Map}
-                            _setMap={_setMap}
-                            setSelected={setSelected}
-                            setShow={setShow}
-                          />
-                        ),
-                      });
-                    }}
-                    title={"Crear emplazamiento"}
-                    data-type="1"
-                  >
-                    <div
-                      className="w-full h-full absolute z-50 bg-transparent border-none p-0 m-0 left-0 top-0"
-                      data-type="1"
-                    ></div>
-                    <span style={{ color: "gray" }}>
-                      <BuildingLibraryIcon className="w-full h-auto" />
-                      <span className="text-black">Emplaza...</span>
-                    </span>
-                  </li>
+
+                  {/* Icono gris de estación (casita) de la barra izquierda */}
                   <li
                     className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${selected === 2
                       ? "border-solid border-2 border-slate-900"
@@ -102,7 +69,7 @@ export default function Sidebar({
                       // Mostramos el formulario para crear estación
                       setModal({
                         ...Modal,
-                        title: "Crear estación",
+                        title: "Crear Estación",
                         content: (
                           <Estacion
                             emplazamiento={null}
@@ -114,7 +81,7 @@ export default function Sidebar({
                         ),
                       });
                     }}
-                    title={"Crear estación"}
+                    title={"Haga clic aquí y posteriormente en el mapa para crear una Estación"}
                     data-type="2"
                   >
                     <div
@@ -123,42 +90,12 @@ export default function Sidebar({
                     ></div>
                     <span style={{ color: "gray" }}>
                       <HomeIcon className="w-full h-auto" />
-                      <span className="text-black">Estación</span>
+                      <div style={{textAlign: 'center'}}>
+                        <span className="text-black">Crear</span>
+                      </div>
                     </span>
                   </li>
-                  <li
-                    className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${selected === 3
-                      ? "border-solid border-2 border-slate-900"
-                      : ""
-                      }`}
-                    onClick={(e) => {
-                      seleccionarHerramienta(e);
-                      // Mostramos el formulario para crear sensor
-                      setModal({
-                        ...Modal,
-                        title: "Crear sensor",
-                        content: (
-                          <Sensor
-                            _Map={_Map}
-                            _setMap={_setMap}
-                            setSelected={setSelected}
-                            setShow={setShow}
-                          />
-                        ),
-                      });
-                    }}
-                    title={"Crear sensor"}
-                    data-type="3"
-                  >
-                    <div
-                      className="w-full h-full absolute z-50 bg-transparent border-none p-0 m-0 left-0 top-0"
-                      data-type="3"
-                    ></div>
-                    <span style={{ color: "gray" }}>
-                      <InboxIcon className="w-full h-auto" />
-                      <span className="text-black">Sensor</span>
-                    </span>
-                  </li>
+
                 </ul>
               </details>
             </>
@@ -173,7 +110,7 @@ export default function Sidebar({
 
         </nav>
 
-        {/* para llamar rapidamente a una pagina y hacer pruebas */}
+        {/* para llamar rapidamente a una pagina y hacer pruebas
         <div className="flex items-center justify-center">
           <Link
             href={"/anomalias"}
@@ -181,7 +118,7 @@ export default function Sidebar({
           >
             Anomalias
           </Link>
-        </div>
+        </div> */}
 
       </div>
     </>

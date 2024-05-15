@@ -3,7 +3,6 @@
 import Sidebar from "./components/Sidebar";
 
 import { usePathname, useRouter } from "next/navigation";
-import Guralp from "./guralp/page";
 import Volcan from "./volcan/page";
 
 export default function Home() {
@@ -14,7 +13,7 @@ export default function Home() {
     const pathname = usePathname();
     switch (pathname) {
       case "/":
-        return <h1>Hola</h1>
+        return <h1>.:.OVASI.:.</h1>
       case "/volcan":
         return (
           <Volcan />

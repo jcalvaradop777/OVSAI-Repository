@@ -6,7 +6,6 @@ import Map from "../components/Map";
 import ListSearch from "../components/ListSearch";
 
 import { usePathname, useRouter } from "next/navigation";
-import Guralp from "../guralp/page";
 import Basic from "../components/Modals/Basic";
 
 export default function Volcan() {
@@ -17,15 +16,18 @@ export default function Volcan() {
     { name: "Volcán Cumbal", lat: 0.95583333333333, long: -77.883333333333 },
   ]);
 
-  // Estado para manejar ventana modal de crear emplazamiento, estación y sensor
+  // Estado para manejar ventana modal de estación
   const [Modal, setModal] = useState({
     title: null,
     content: null,
   });
-  // Estado para manejar la vista de ventana modal de crear emplazamiento, estación y sensor
+
+  // Estado para manejar la vista de ventana modal de crear estación
   const [show, setShow] = useState(false);
+
   // Estado para manejar el menú de elementos/herramientas
   const [selected, setSelected] = useState(0);
+
   // Estado para manejar la configuración del mapa
   const [_Map, _setMap] = useState({
     _data: {},
@@ -56,12 +58,10 @@ export default function Volcan() {
             _setMap={_setMap}
             selected={selected}
             setSelected={setSelected}
-            setShow={setShow}       
-            show={show}   
+            setShow={setShow}
+            show={show}
           />
         );
-      case "/guralp":
-        return <Guralp />;
       default:
         return <h1>No encontrado</h1>;
     }

@@ -3,8 +3,7 @@ import { getDataFromTable } from "@/app/db/tables/read";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  // Iniciamos las base de datos
-  // Solo si no están creadas, de lo contrario es para asegurarse
+  // Iniciamos las base de datos solo si no están creadas, es para asegurarse
   await initTables();
   const estaciones = await getDataFromTable('estaciones');
 

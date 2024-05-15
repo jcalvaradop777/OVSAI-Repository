@@ -11,7 +11,7 @@ export default function ListSearch({ volcanes }) {
   return (
     <div className="absolute ml-[326px] w-max bg-slate-200 top-1 z-50">
       <button
-        className="flex w-max rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+        className="flex w-max rounded-lg  bg-[#82A53D] px-4 py-2 text-left text-sm font-medium text-white hover:bg-[#C4D92E] hover:text-[#8A8C8E] focus:outline-none focus-visible:ring"
         onClick={open}
       >
         Seleccionar volcán

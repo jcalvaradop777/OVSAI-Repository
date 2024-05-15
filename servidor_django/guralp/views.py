@@ -6,7 +6,8 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-rutaGcf = ""
+#rutaGcf = "D:/SGC/GCF/"
+rutaGcf = "X:/"
 rutaGcfFecha = ""
 rutaGcfFechaSubfolder = ""
 rutaGcfFechaSubfolderFile = ""
@@ -19,7 +20,7 @@ def fecha2Subfolders(request):
         try:
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
-            rutaGcf = "D:/SGC/GCF/" # Ruta local
+            #rutaGcf = "D:/SGC/GCF/" # Ruta local
             #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
@@ -79,14 +80,16 @@ def trazas(request):
     
 @csrf_exempt
 def anomalias(request): 
+    
+    global rutaGcf
 
     if request.method == 'POST': 
         try:
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
             
-            rutaGcf = "D:/SGC/GCF/" # Ruta local
-            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
+            #rutaGcf = "D:/SGC/GCF/" # Ruta local
+            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos  
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]
