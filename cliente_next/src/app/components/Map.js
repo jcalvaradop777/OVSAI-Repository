@@ -4,25 +4,15 @@ import React, { useEffect, useRef, useState } from "react";
 import * as maptilersdk from "@maptiler/sdk";
 import { ENV } from "@/config/env";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
-import Emplazamiento from "./Forms/Emplazamiento";
-import Estacion from "./Forms/Estacion";
-import Sensor from "./Forms/Sensor";
-import MenuContext from "./Map/MenuCtx";
+import IngresarEstacion from "./Estaciones/FrmIngresarEstacion";
+import MenuContext from "./Estaciones/MenuCtx";
 
-export default function Map({
-  Modal,
-  setModal,
-  _Map,
-  _setMap,
-  selected,
-  setSelected,
-  setShow,
-  show,
-}) {
+export default function Map({Modal, setModal, _Map, _setMap, selected, setSelected, setShow, show,}) {
+  
   const mapContainer = useRef(null);
   const map = useRef(null);
   // const tokyo = { lng: 139.753, lat: 35.6844 };
-  const tokyo = { lng: -77.253837, lat: 1.209139 }; // posición del observatorio vulcanológico de Pasto
+  const ovspa = { lng: -77.253837, lat: 1.209139 }; // posición del observatorio vulcanológico de Pasto
   const [Mposition, setMposition] = useState({
     x: 0,
     y: 0,
@@ -34,11 +24,6 @@ export default function Map({
 
   maptilersdk.config.apiKey = ENV.API_KEY;
 
-  const obtenerEmplazamientos = async () => {
-    const res = await fetch(`${ENV.URLBASE}api/emplazamientos/get/`);
-    return res.json();
-  };
-
   const obtenerEstaciones = async () => {
     const res = await fetch(`${ENV.URLBASE}api/estaciones/get/`);
     return res.json();
@@ -46,59 +31,30 @@ export default function Map({
 
   // Obtener icono marcador
 
-  const obtenerIconoMarcador = (tipo) => {
-    const icons = {
-      1: `<svg
+  const obtenerIconoMarcador = () => {
+    const icon =  // icono de lacasia que representa la estación
+       `<svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
-          stroke="currentColor"
+          stroke=#82A53D
           class="w-10 h-10"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
-          />
-        </svg>`,
-      2: `<svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="w-10 h-10"
-        >
+        <circle cx="12" cy="12" r="14" stroke="red" fill="none" />
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
           />
-        </svg>`,
-      3: `<svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          class="10 h-10"
-        >
-          <path
-            stroke.linecap="round"
-            stroke-linejoin="round"
-            d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H6.911a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661Z"
-          />
-        </svg>`,
-    };
+        </svg>`
 
-    return icons[parseInt(tipo)];
+    return icon;
   };
 
   useEffect(() => {
     if (_Map.reload) {
       // Eliminar marcadores
-
       if (Array.isArray(_Map.markers) && _Map.markers.length > 0) {
         _Map.markers.forEach((mark) => {
           mark.remove();
@@ -107,97 +63,27 @@ export default function Map({
 
       // Obtener marcadores con api
 
-      // Obtener emplazamientos
-
-      setTimeout(() => {
-        obtenerEmplazamientos()
-          .then((res) => {
-            if (Array.isArray(res)) {
-              if (res.length > 0) {
-                res.forEach((mark) => {
-                  // Creamos marcador para insertar en mapa
-                  // Crear función para agregar imagen al marcador
-
-                  var el = document.createElement("div");
-                  el.className = "w-auto h-auto";
-                  el.innerHTML = obtenerIconoMarcador(mark.type);
-                  el.style.borderRadius = "50%";
-                  el.style.backgroundColor = "#fff";
-                  el.style.padding = "5px";
-
-                  const marker = new maptilersdk.Marker({ element: el })
-                    .setLngLat([mark.longitude, mark.latitude])
-                    .setPopup(
-                      new maptilersdk.Popup().setHTML(`
-                  Nombre: ${mark.name}<br>
-                  Posición: [lng: ${mark.longitude}, lat: ${mark.latitude}]          
-                  `)
-                    )
-                    .addTo(map.current);
-
-                  // Opciones al hacer clic derecho a los marcadores
-                  marker.getElement().addEventListener("contextmenu", (e) => {
-                    const { x, y } = e;
-
-                    if (mark.type === 1) {
-                      setModal({
-                        ...Modal,
-                        show: false,
-                      });
-                    }
-
-                    setMposition({
-                      x: x,
-                      y: y,
-                      visible: true,
-                      element: mark.type === 1 ? mark : null,
-                    });
-                  });
-                  // ---
-
-                  _setMap({
-                    ..._Map,
-                    markers: [marker, ..._Map.markers],
-                    reload: false,
-                  });
-                });
-              }
-            }
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }, 2000);
-
-      // ---
-
       // Obtener estaciones
-
       setTimeout(() => {
         obtenerEstaciones()
           .then((res) => {
             if (Array.isArray(res)) {
               if (res.length > 0) {
                 res.forEach((mark) => {
-                  if (mark.longitude && mark.latitude) {
+                  if (mark.longitud && mark.latitud) {
                     // Creamos marcador para insertar en mapa
-                    // Crear función para agregar imagen al marcador
-
+                    //  función para agregar imagen al marcador (icono)
                     var el = document.createElement("div");
                     el.className = "w-auto h-auto";
-                    el.innerHTML = obtenerIconoMarcador(mark.type);
+                    el.innerHTML = obtenerIconoMarcador();
                     el.style.borderRadius = "50%";
-                    el.style.backgroundColor = "#fff";
+                    el.style.backgroundColor = "#fff";  // aqui se cambia el color de fondo de los iconos de cada estación
                     el.style.padding = "5px";
 
+                    // Información emergente del icono de cada estación
                     const marker = new maptilersdk.Marker({ element: el })
-                      .setLngLat([mark.longitude, mark.latitude])
-                      .setPopup(
-                        new maptilersdk.Popup().setHTML(`
-                Nombre: ${mark.name}<br>
-                Posición: [lng: ${mark.longitude}, lat: ${mark.latitude}]          
-                `)
-                      )
+                      .setLngLat([mark.longitud, mark.latitud])
+                      .setPopup(new maptilersdk.Popup().setHTML(`Estación: ${mark.nombre}<br> Longitud: ${mark.longitud}<br> Latitud: ${mark.latitud}`))
                       .addTo(map.current);
 
                     // Opciones al hacer clic derecho a los marcadores
@@ -215,7 +101,7 @@ export default function Map({
                         x: x,
                         y: y,
                         visible: true,
-                        element: mark.type >= 1 ? mark : null,
+                        element: mark
                       });
                     });
                     // ---
@@ -233,30 +119,19 @@ export default function Map({
           .catch((err) => {
             console.log(err);
           });
-      }, 2000);
+      }, 2000); // el 2000 es depués de 2 segundos
 
       // ---
     }
   }, [_Map.markers, _Map.reload, selected]);
 
   useEffect(() => {
-    if (selected === 1) {
+ 
+    if (selected === 2) {
       setModal({
         ...Modal,
         content: (
-          <Emplazamiento
-            _Map={_Map}
-            _setMap={_setMap}
-            setSelected={setSelected}
-            setShow={setShow}
-          />
-        ),
-      });
-    } else if (selected === 2) {
-      setModal({
-        ...Modal,
-        content: (
-          <Estacion
+          <IngresarEstacion
             emplazamiento={null}
             _Map={_Map}
             _setMap={_setMap}
@@ -265,19 +140,7 @@ export default function Map({
           />
         ),
       });
-    } else if (selected === 3) {
-      setModal({
-        ...Modal,
-        content: (
-          <Sensor
-            _Map={_Map}
-            _setMap={_setMap}
-            setSelected={setSelected}
-            setShow={setShow}
-          />
-        ),
-      });
-    }
+    } 
 
     // ---
 
@@ -318,10 +181,11 @@ export default function Map({
 
     if (map.current) return; // stops map from intializing more than once
 
+    // Aqui se ponen los controles de la derecha en el mapa
     map.current = new maptilersdk.Map({
       container: mapContainer.current,
       style: "hybrid",
-      center: [tokyo.lng, tokyo.lat],
+      center: [ovspa.lng, ovspa.lat],
       zoom: zoom,
       hash: true,
       terrainControl: true,
@@ -330,7 +194,7 @@ export default function Map({
       geolocateControl: true,
       navigationControl: true,
     });
-  }, [tokyo.lng, tokyo.lat, zoom, show, _Map, selected]);
+  }, [ovspa.lng, ovspa.lat, zoom, show, _Map, selected]);
 
   const openModal = () => {
     setShow(true);

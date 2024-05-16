@@ -2,8 +2,8 @@
 
 "use client";
 
-import SidebarAnomalias from '../components/SidebarAnomalias';
-import { useEffect, useState } from "react";
+import SidebarAnomalias from '../components/TimeSeries/SidebarAnomalias';
+import { useEffect, useState } from "react"; 
 
 export default function RenderAnomalias() {
 

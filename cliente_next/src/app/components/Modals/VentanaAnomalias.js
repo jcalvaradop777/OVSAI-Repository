@@ -3,7 +3,8 @@ import RenderAnomalias from "@/app/anomalias/page";
 
 // Este componente es una ventana modal que muestra los datos de Guralp como trazas
 
-export default function VentanaAnomalias({ mostrarVentana, setVentana }) {
+export default function VentanaAnomalias({ mostrarAnomalias, setAnomalias }) {
+  
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
 
   return (
@@ -46,7 +47,7 @@ export default function VentanaAnomalias({ mostrarVentana, setVentana }) {
             type="button"
             className="text-white bg-[#82A53D] hover:bg-[#C4D92E] hover:text-[#8A8C8E] focus:ring-4 focus:text-white focus:ring-red-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             onClick={() => {
-              setVentana(false);
+              setAnomalias(false);
             }}
           >
             Cerrar

@@ -2,10 +2,9 @@
 
 "use client";
 
-import Traza from '../components/Traza';
-import TrazaAgrupada from '../components/TrazaAgrupada';
-import BoxPlot from '../components/BoxPlot';
-import SidebarTrazas from '../components/SidebarTrazas';
+import TrazaAgrupada from '../components/TimeSeries/TrazaAgrupada';
+import BoxPlot from '../components/TimeSeries/BoxPlot';
+import SidebarTrazas from '../components/TimeSeries/SidebarTrazas';
 import { useEffect, useState } from "react";
 
 export default function RenderTrazaGuralp() {

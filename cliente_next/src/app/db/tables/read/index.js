@@ -1,10 +1,7 @@
 import { iniciarDB } from "@/app/db/index";
 
-export async function getDataFromTable(
-  tableName,
-  columns = ["*"],
-  whereClause = null,
-) {
+export async function getDataFromTable(tableName, columns=["*"], whereClause=null) {
+
   const pool = await iniciarDB();
 
   try {
