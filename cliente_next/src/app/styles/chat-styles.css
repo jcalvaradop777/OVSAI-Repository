@@ -1,0 +1,35 @@
+.container-column {
+  @apply relative w-80 h-screen bg-transparent border-none inline-block align-top;
+}
+
+.btn-chat-header {
+  @apply py-2 px-2 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 inline-block relative cursor-pointer select-none;
+}
+
+.icon-chat-header {
+    @apply w-4 h-4;
+}
+
+.name-chat {
+    @apply inline-block relative mr-2 align-middle;
+}
+
+.btn-cancel {
+    @apply focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2;
+}
+
+.chat-main {
+    @apply relative bg-white rounded-lg box-border p-2 m-2;
+}
+
+.item-chat {
+    @apply relative cursor-text select-text p-2 m-2 rounded-lg w-1/2 bg-emerald-900 text-white;
+}
+
+.input-chat {
+    @apply fixed md:w-1/2 sm:w-1/6 h-auto p-6 bottom-0;
+}
+
+.input-message-contain {
+    @apply relative p-2 cursor-text select-text m-2 border-slate-700 focus:outline-none text-base;
+}

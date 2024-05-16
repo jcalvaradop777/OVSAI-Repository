@@ -2,10 +2,10 @@
   "name": "volcan_cesteamup",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
+  "scripts": {    
+    "dev": "node server.js",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint"
   },
   "dependencies": {
@@ -23,6 +23,8 @@
     "react-dom": "^18",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.22.3",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
     "sort-by": "^1.2.0"
   },
   "devDependencies": {
