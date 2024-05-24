@@ -35,4 +35,12 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-23 ABRIL 2024
+______________________Estructura______________________
+En api se tiene la interacción con la BD CRUD
+
+En componentes a modo de objeto se encuentran las estaciones, dispositivos,series de tiempo y además están las ventanas modales que ecapsulan
+las ventanas emergentes de los componentes (pone la activación de pantalla completa)
+
+db contiene la estructura en sql de la base de datos
+
+npm run nextdev  (cuando se elimina la carpenta Next de forma manual). Antes se le da npm install

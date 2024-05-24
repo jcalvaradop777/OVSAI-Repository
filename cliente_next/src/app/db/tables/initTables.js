@@ -28,6 +28,7 @@ export async function initTables() {
   ]);
 
   await createTable("dispositivos", [
+    "id_dispositivo int(11) AUTO_INCREMENT PRIMARY KEY",
     "grupo VARCHAR(50)",
     "subgrupo VARCHAR(50)",
     "placa VARCHAR(50)",
@@ -53,7 +54,7 @@ export async function initTables() {
     "FOREIGN KEY (estacion) REFERENCES estaciones(id)" 
   ]);
 
-  await createTable("anomalias", [
+  await createTable("anomaliasguralp", [
     "id_anomalia int(11) AUTO_INCREMENT PRIMARY KEY",
     "fecha VARCHAR(50) NOT NULL",
     "canal VARCHAR(50) NOT NULL",
@@ -61,4 +62,25 @@ export async function initTables() {
     "tipoTraza VARCHAR(50) NOT NULL"
   ]);
 
-}
+  await createTable("nscl", [
+    "id_nscl int(11) AUTO_INCREMENT PRIMARY KEY",
+    "codigo_localizacion VARCHAR(50)",
+    "instrumento VARCHAR(50)",
+    "fecha_inicio VARCHAR(50)",
+    "fecha_finalizacion VARCHAR(50)",
+    "sensor VARCHAR(10)",
+    "digitalizador VARCHAR(10)",
+    "almacenamiento VARCHAR(50)",
+    "condicion_instalacion VARCHAR(50)",
+    "transmisión VARCHAR(50)",
+    "descarga VARCHAR(50)",
+    "alcance VARCHAR(50)",
+    "tipo_estacion VARCHAR(50)",
+    "tipo_adquisicion VARCHAR(50)",
+    "estado VARCHAR(50) NOT NULL",
+    "comentarios VARCHAR(50)",
+    "estacion VARCHAR(50)",
+    "FOREIGN KEY (estacion) REFERENCES estaciones(id)" 
+  ]);
+
+} // las tablas, dentro de esta llave

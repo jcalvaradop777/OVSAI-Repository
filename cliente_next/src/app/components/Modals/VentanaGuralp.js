@@ -1,56 +1,60 @@
-import {useState } from "react";
+import { useState } from "react";
 import RenderTrazaGuralp from "@/app/guralp/page";
+import { XMarkIcon } from "@heroicons/react/20/solid";
+import { ArrowsPointingInIcon } from "@heroicons/react/20/solid";
+import { ArrowsPointingOutIcon } from "@heroicons/react/20/solid";
 
 // Este componente es una ventana modal que muestra los datos de Guralp como trazas
 
 export default function VentanaGuralp({ mostrarVentana, setVentana }) {
+  
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
 
   return (
     <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
       <div
-        className={`block ml-auto mr-auto p-0 relative ${
-          pantallaCompleta ? "w-full h-full" : "top-1/4 max-w-sm min-w-44 bottom-10"
-        } rounded-xl`}
+        className={`block ml-auto mr-auto p-0 relative ${pantallaCompleta ? "w-full h-full" : "top-1/4 max-w-sm min-w-44 bottom-10"
+          } rounded-xl`}
       >
-        <section
-          className="relative p-2 block bg-slate-100 text-slate-800 rounded-tl-[inherit] rounded-tr-[inherit]"
-          role="heading"
-        >
+
+        <div className="flex items-center justify-center bg-[#82A53D]">
+          <h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-white ml-auto">
+            <b>Series de tiempo Guralp</b>
+          </h5>
+
           <button
             type="button"
-            className="text-white bg-[#82A53D] hover:bg-[#C4D92E] hover:text-[#8A8C8E] focus:ring-4  focus:text-white focus:ring-red-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+            className="btn-maximiza"
             onClick={() => {
               setPantallaCompleta(!pantallaCompleta);
             }}
           >
             {pantallaCompleta
-              ? "Desactivar pantalla completa"
-              : "Activar pantalla completa"}
+              ? <ArrowsPointingInIcon className="h-5 w-5"/> // iciono maximiza
+              : <ArrowsPointingOutIcon className="h-5 w-5"/>} 
           </button>
-        </section>
+
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => {
+              setVentana(false);
+            }}
+          >
+            <XMarkIcon  // icono cerrar
+              width="20"
+              height="20"
+            />
+          </button>
+        </div>
+
         <section
           role="main"
           className="p-2 relative block bg-slate-100 text-slate-800"
         >
           <div className="flex">
-            <RenderTrazaGuralp /> 
+            <RenderTrazaGuralp />
           </div>
-        </section>
-        
-        <section
-          role="footer"
-          className="p-2 relative block bg-slate-100 text-slate-800 rounded-bl-[inherit] rounded-br-[inherit]"
-        >
-          <button
-            type="button"
-            className="text-white bg-[#82A53D] hover:bg-[#C4D92E] hover:text-[#8A8C8E] focus:ring-4 focus:text-white focus:ring-red-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            onClick={() => {
-              setVentana(false);
-            }}
-          >
-            Cerrar
-          </button>
         </section>
 
       </div>

@@ -4,6 +4,7 @@ import Estacion from "./FrmIngresarEstacion";
 import VentanaEditarEstacion from "../Modals/VentanaEditarEstacion";
 import VentanaIngresarDispositivo from "../Modals/VentanaIngresarDispositivo";
 import VentanaAnomalias from "../Modals/VentanaAnomalias";
+import { ENV } from "@/config/env";
 
 export default function MenuContext({
   Mposition,  // almacena la información de la estación
@@ -15,6 +16,7 @@ export default function MenuContext({
   setSelected,
   setShow,
 }) {
+
   const [mostrarVentana, setVentana] = useState(false);
   const [mostrarAnomalias, setAnomalias] = useState(false);
   const [mostrarEdicion, setEdicion] = useState(false);
@@ -57,23 +59,18 @@ export default function MenuContext({
   const handleEliminar = async () => {
     if (Mposition.element != null) {
       const confirm = window.confirm(
-        `¿Estás seguro que deseas eliminar el elemento ${Mposition.element.name}?`
+        `¿Estás seguro que deseas eliminar el elemento ${Mposition.element.nombre}?`
       );
       if (confirm) {
-        const response = await fetch(
-          Mposition.element.type === 1
-            ? "/api/emplazamientos/delete"
-            : Mposition.element.type === 2
-              ? "/api/estaciones/delete"
-              : "",
-          {
+        const response = await fetch(ENV.URLBASE + "/api/estaciones/delete", {
             method: "DELETE",
             headers: {
+              Accept: "application/json",
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
               id: Mposition.element.id,
-              type: Mposition.element.type,
+              //type: Mposition.element.type,
             }),
           }
         );
@@ -84,6 +81,14 @@ export default function MenuContext({
             _data: {},
             reload: true,
           });
+
+          setMPosition({
+            x: 0,
+            y: 0,
+            visible: false,
+            element: null
+          });
+          
         }
       }
     }
@@ -182,7 +187,7 @@ export default function MenuContext({
       {showDispositivos ? (
         <VentanaIngresarDispositivo
           mostrar={showDispositivos}
-          id={Mposition.element.id}
+          id={Mposition.element.id} // el id es el identificador de la estación
         />
       ) : (
         <></>

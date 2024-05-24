@@ -9,7 +9,7 @@ export async function DELETE(req) {
       await initTables();
   
       const _object = await req.json();
-      await deleteDataFromTable("estaciones", "WHERE id = " + _object.id);
+      await deleteDataFromTable("estaciones", `WHERE id='${_object.id}'`);  
   
       return NextResponse.json({
         success: true,

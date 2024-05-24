@@ -11,7 +11,6 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
   
   const mapContainer = useRef(null);
   const map = useRef(null);
-  // const tokyo = { lng: 139.753, lat: 35.6844 };
   const ovspa = { lng: -77.253837, lat: 1.209139 }; // posición del observatorio vulcanológico de Pasto
   const [Mposition, setMposition] = useState({
     x: 0,
@@ -53,12 +52,22 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
   };
 
   useEffect(() => {
+
     if (_Map.reload) {
+
       // Eliminar marcadores
+
       if (Array.isArray(_Map.markers) && _Map.markers.length > 0) {
-        _Map.markers.forEach((mark) => {
-          mark.remove();
-        });
+        _setMap({
+          ...Map,
+          markers: []
+        })
+      }
+      const getMarkers = document.querySelectorAll(".maplibregl-marker");
+      if(getMarkers.length > 0) {
+        for(let m of getMarkers) {
+          if(m) m.remove();
+        }
       }
 
       // Obtener marcadores con api
@@ -111,6 +120,7 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
                       markers: [marker, ..._Map.markers],
                       reload: false,
                     });
+
                   }
                 });
               }
@@ -119,7 +129,7 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
           .catch((err) => {
             console.log(err);
           });
-      }, 2000); // el 2000 es depués de 2 segundos
+      }, 1000); // el 2000 es depués de 2 segundos
 
       // ---
     }
