@@ -3,6 +3,7 @@ import VentanaGuralp from "../Modals/VentanaGuralp";
 import Estacion from "./FrmIngresarEstacion";
 import VentanaEditarEstacion from "../Modals/VentanaEditarEstacion";
 import VentanaIngresarDispositivo from "../Modals/VentanaIngresarDispositivo";
+import VentanaNscl from "../Modals/VentanaNscl";
 import VentanaAnomalias from "../Modals/VentanaAnomalias";
 import { ENV } from "@/config/env";
 
@@ -21,6 +22,9 @@ export default function MenuContext({
   const [mostrarAnomalias, setAnomalias] = useState(false);
   const [mostrarEdicion, setEdicion] = useState(false);
   const [showDispositivos, setMostrarDispositivos] = useState(false);
+  const [showNscls, setMostrarNscls] = useState(false);
+
+  VentanaNscl
   // Estado de modal para editar emplazamiento/estación/sensor
 
   const abrirTrazas = () => {
@@ -63,16 +67,16 @@ export default function MenuContext({
       );
       if (confirm) {
         const response = await fetch(ENV.URLBASE + "/api/estaciones/delete", {
-            method: "DELETE",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: Mposition.element.id,
-              //type: Mposition.element.type,
-            }),
-          }
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: Mposition.element.id,
+            //type: Mposition.element.type,
+          }),
+        }
         );
 
         if (response.ok) {
@@ -88,7 +92,7 @@ export default function MenuContext({
             visible: false,
             element: null
           });
-          
+
         }
       }
     }
@@ -96,6 +100,10 @@ export default function MenuContext({
 
   const verDispositivos = () => {
     setMostrarDispositivos(true);
+  };
+
+  const verNscl = () => {
+    setMostrarNscls(true);
   };
 
   return (
@@ -137,6 +145,13 @@ export default function MenuContext({
           onClick={verDispositivos}
         >
           Dispositivos
+        </li>
+
+        <li
+          className="cursor-pointer select-none p-2 rounded-md"
+          onClick={verNscl}
+        >
+          Nscl
         </li>
 
         {Mposition.element != null ? (
@@ -187,6 +202,15 @@ export default function MenuContext({
       {showDispositivos ? (
         <VentanaIngresarDispositivo
           mostrar={showDispositivos}
+          id={Mposition.element.id} // el id es el identificador de la estación
+        />
+      ) : (
+        <></>
+      )}
+
+      {showNscls ? (
+        <VentanaNscl
+          mostrar={showNscls}
           id={Mposition.element.id} // el id es el identificador de la estación
         />
       ) : (

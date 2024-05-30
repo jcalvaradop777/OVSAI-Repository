@@ -63,7 +63,7 @@ export async function initTables() {
   ]);
 
   await createTable("nscl", [
-    "id_nscl int(11) AUTO_INCREMENT PRIMARY KEY",
+    "id_nscl VARCHAR(50)",
     "codigo_localizacion VARCHAR(50)",
     "instrumento VARCHAR(50)",
     "fecha_inicio VARCHAR(50)",
@@ -72,7 +72,7 @@ export async function initTables() {
     "digitalizador VARCHAR(10)",
     "almacenamiento VARCHAR(50)",
     "condicion_instalacion VARCHAR(50)",
-    "transmisión VARCHAR(50)",
+    "transmision VARCHAR(50)",
     "descarga VARCHAR(50)",
     "alcance VARCHAR(50)",
     "tipo_estacion VARCHAR(50)",
@@ -82,5 +82,5 @@ export async function initTables() {
     "estacion VARCHAR(50)",
     "FOREIGN KEY (estacion) REFERENCES estaciones(id)" 
   ]);
-
+ 
 } // las tablas, dentro de esta llave
