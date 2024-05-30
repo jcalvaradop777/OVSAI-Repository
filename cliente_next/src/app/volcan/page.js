@@ -35,6 +35,11 @@ export default function Volcan() {
     reload: true,
   });
 
+  // Estado para manejar la recarga de las estaciones en el Sidebar
+  // true -> se vuelven a cargar las estaciones
+  // false -> no se carga
+  //const [recargarEstaciones, setRecargarEstaciones] = useState(true);
+
   useEffect(() => {
     const adMap = document.querySelector(".maplibregl-control-container");
 

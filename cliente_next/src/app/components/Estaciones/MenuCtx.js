@@ -60,15 +60,12 @@ export default function MenuContext({
         `¿Estás seguro que deseas eliminar el elemento ${Mposition.element.name}?`
       );
       if (confirm) {
-        const response = await fetch(
-          Mposition.element.type === 1
-            ? "/api/emplazamientos/delete"
-            : Mposition.element.type === 2
-              ? "/api/estaciones/delete"
-              : "",
+        const response = fetch(
+          "/api/estaciones/delete",
           {
             method: "DELETE",
             headers: {
+              Accept: "application/json",
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -76,15 +73,18 @@ export default function MenuContext({
               type: Mposition.element.type,
             }),
           }
-        );
-
-        if (response.ok) {
-          _setMap({
-            ..._Map,
-            _data: {},
-            reload: true,
-          });
-        }
+        ).then((res) => {
+          if (res.ok) {
+            _setMap({
+              ..._Map,
+              _data: {},
+              markers: [],
+              reload: true,
+            });
+          }
+        }).catch((err) => {
+          console.error(err);
+        })
       }
     }
   };

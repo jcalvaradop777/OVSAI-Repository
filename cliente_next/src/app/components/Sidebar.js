@@ -10,6 +10,9 @@ import { usePathname } from "next/navigation";
 
 // Componentes
 import Estacion from "./Estaciones/FrmIngresarEstacion";
+import FiltrosEstaciones from "./Estaciones/FiltrosEstaciones";
+import { ENV } from "@/config/env";
+import { useEffect, useState } from "react";
 export default function Sidebar({
   Modal,
   setModal,
@@ -17,7 +20,7 @@ export default function Sidebar({
   _setMap,
   selected,
   setSelected,
-  setShow,
+  setShow
 }) {
   const pathname = usePathname();
 
@@ -33,6 +36,23 @@ export default function Sidebar({
       setSelected((value) => (value = 0));
     }
   };
+
+  const obtenerEstaciones = async () => {
+    const res = await fetch(`${ENV.URLBASE}api/estaciones/get/`);
+    return res.json();
+  };
+
+  const [last, setLast] = useState(null);
+  const [estaciones, setEstaciones] = useState([]);
+
+  useEffect(() => {
+    if(last != _Map.markers.length) {
+      obtenerEstaciones().then((res) => {
+        setEstaciones(res);
+        if(Array.isArray(res)) setLast(res.length);
+      }).catch((err) => console.error(err));
+    }
+  }, [_Map, last]);
 
   return (
     <>
@@ -95,9 +115,9 @@ export default function Sidebar({
                       </div>
                     </span>
                   </li>
-
                 </ul>
               </details>
+              <FiltrosEstaciones datos={estaciones} setEstaciones={setEstaciones} campos={["id", "nombre"]} />
             </>
           ) : (
             <Link

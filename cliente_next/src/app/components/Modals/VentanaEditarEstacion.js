@@ -1,10 +1,18 @@
-import {useState } from "react";
+import {useEffect } from "react";
 import EditarEstacion from "../Estaciones/FrmEditarEstacionTotal";
 
 // Este componente es una ventana modal que muestra los datos de Guralp como trazas
 
 export default function VentanaEditarEstacion({ mostrar, setMostrar, id }) {
   
+  useEffect(() => {
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") {
+        setMostrar(false);
+      }
+    })
+  })
+
   return (
     <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
       
