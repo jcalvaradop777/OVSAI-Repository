@@ -33,6 +33,7 @@ def getSubfoldersNames(folder_path):
     if ".ipynb_checkpoints" in subfolder_names:
         subfolder_names.remove(".ipynb_checkpoints")
     subfolder_names = {'subfolder_names': subfolder_names}
+    #print(subfolder_names)
     return subfolder_names
 
 def getAnomalias(folderFecha_path):

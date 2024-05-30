@@ -89,7 +89,7 @@ export default function Sidebar({
                       // Mostramos el formulario para crear estación
                       setModal({
                         ...Modal,
-                        title: "Crear Estación",
+                        //title: "Crear Estación",
                         content: (
                           <Estacion
                             emplazamiento={null}

@@ -8,6 +8,17 @@ const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro 
 
   const [datos, setdatos] = useState({ fecha: "", canal: "", archivoGCF: "", tipoTraza: "" }); // para base de datos
 
+  const [estacionesGuralp, setEstacionesGuralp] = useState({
+    ROCP: "ovsp_aroc",
+    LIMP: "ovsp_clim",
+    MESP: "ovsp_cmes",
+    ARLP: "ovsp_garl",
+    COBP: "ovsp_gcob",
+    CONP: "ovsp_gcon",
+    CHIP: "ovsp_ichi",
+    CERP: "ovsp_ncer",
+  });
+
   const handleDateChange = (event) => { // función llamada en el onChange del imput Calenario cuando se selecciona una fecha
     fecha2Subfolders(event.target.value); // envía la fecha (event.target.value tiene la fecha seleccionada en el calendario)
     setdatos({ ...datos, fecha: event.target.value })
@@ -116,7 +127,7 @@ const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro 
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body:JSON.stringify(datos)
+      body: JSON.stringify(datos)
     }) // envia una petición
   };
 
@@ -125,7 +136,7 @@ const SidebarTrazas = ({ onEnviarDatos }) => { // onEnviarDatos es un parametro 
 
     <div className="relative flex flex-col bg-clip-border bg-gray-200 text-gray-700 h-[calc(100vh)] w-full max-w-[15rem] p-4 shadow-xl shadow-blue-gray-900/5 z-50">
 
-      <div className="flex items-center justify-center bg-[#9FBC2E]">
+      <div className="flex items-center justify-center bg-[#8A8C8E]">
         <h2 className="text-2xl font-bold text-white mt-8 mb-8">Gráficas</h2>
       </div>
 

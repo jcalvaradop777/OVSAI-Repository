@@ -3,7 +3,9 @@ import VentanaGuralp from "../Modals/VentanaGuralp";
 import Estacion from "./FrmIngresarEstacion";
 import VentanaEditarEstacion from "../Modals/VentanaEditarEstacion";
 import VentanaIngresarDispositivo from "../Modals/VentanaIngresarDispositivo";
+import VentanaNscl from "../Modals/VentanaNscl";
 import VentanaAnomalias from "../Modals/VentanaAnomalias";
+import { ENV } from "@/config/env";
 
 export default function MenuContext({
   Mposition,  // almacena la información de la estación
@@ -15,10 +17,14 @@ export default function MenuContext({
   setSelected,
   setShow,
 }) {
+
   const [mostrarVentana, setVentana] = useState(false);
   const [mostrarAnomalias, setAnomalias] = useState(false);
   const [mostrarEdicion, setEdicion] = useState(false);
   const [showDispositivos, setMostrarDispositivos] = useState(false);
+  const [showNscls, setMostrarNscls] = useState(false);
+
+  VentanaNscl
   // Estado de modal para editar emplazamiento/estación/sensor
 
   const abrirTrazas = () => {
@@ -57,40 +63,47 @@ export default function MenuContext({
   const handleEliminar = async () => {
     if (Mposition.element != null) {
       const confirm = window.confirm(
-        `¿Estás seguro que deseas eliminar el elemento ${Mposition.element.name}?`
+        `¿Estás seguro que deseas eliminar el elemento ${Mposition.element.nombre}?`
       );
       if (confirm) {
-        const response = fetch(
-          "/api/estaciones/delete",
-          {
-            method: "DELETE",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: Mposition.element.id,
-              type: Mposition.element.type,
-            }),
-          }
-        ).then((res) => {
-          if (res.ok) {
-            _setMap({
-              ..._Map,
-              _data: {},
-              markers: [],
-              reload: true,
-            });
-          }
-        }).catch((err) => {
-          console.error(err);
-        })
+        const response = await fetch(ENV.URLBASE + "/api/estaciones/delete", {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: Mposition.element.id,
+            //type: Mposition.element.type,
+          }),
+        }
+        );
+
+        if (response.ok) {
+          _setMap({
+            ..._Map,
+            _data: {},
+            reload: true,
+          });
+
+          setMPosition({
+            x: 0,
+            y: 0,
+            visible: false,
+            element: null
+          });
+
+        }
       }
     }
   };
 
   const verDispositivos = () => {
     setMostrarDispositivos(true);
+  };
+
+  const verNscl = () => {
+    setMostrarNscls(true);
   };
 
   return (
@@ -132,6 +145,13 @@ export default function MenuContext({
           onClick={verDispositivos}
         >
           Dispositivos
+        </li>
+
+        <li
+          className="cursor-pointer select-none p-2 rounded-md"
+          onClick={verNscl}
+        >
+          Nscl
         </li>
 
         {Mposition.element != null ? (
@@ -182,7 +202,16 @@ export default function MenuContext({
       {showDispositivos ? (
         <VentanaIngresarDispositivo
           mostrar={showDispositivos}
-          id={Mposition.element.id}
+          id={Mposition.element.id} // el id es el identificador de la estación
+        />
+      ) : (
+        <></>
+      )}
+
+      {showNscls ? (
+        <VentanaNscl
+          mostrar={showNscls}
+          id={Mposition.element.id} // el id es el identificador de la estación
         />
       ) : (
         <></>

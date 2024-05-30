@@ -14,6 +14,7 @@ export default function Volcan() {
     { name: "Volcán Galeras", lat: 1.2166666666667, long: -77.366666666667 },
     { name: "Volcán Chiles", lat: 0.82111111, long: -77.935 },
     { name: "Volcán Cumbal", lat: 0.95583333333333, long: -77.883333333333 },
+    { name: "OVSPA", lat: 1.210545, long: -77.257391 },
   ]);
 
   // Estado para manejar ventana modal de estación

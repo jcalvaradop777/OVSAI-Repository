@@ -9,11 +9,6 @@ export async function POST(req) {
 
   try {
     const data = await req.json();
-
-    if (data.emplazamiento === null) {
-      delete data.emplazamiento;
-    }
-
     const names = Object.keys(data);
     const values = Object.values(data);
 
