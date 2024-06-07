@@ -34,6 +34,12 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
       obtenerDispositivos();
       setActualizarDispositivos(true);
     }
+
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") {
+        setShow(false);
+      }
+    })
   }, [load, dispositivos, actualizarDispositivos]);
 
   return (

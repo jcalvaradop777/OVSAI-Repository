@@ -9,10 +9,9 @@ export async function GET(req, ctx) {
 
   await initTables();
 
-  const dispositivos = await getDataFromTable('dispositivos', ["*"], `estacion='${id}'`);  // el id es el identificador de la estación
-
+  const nscl = await getDataFromTable('nscl', ["*"], `estacion='${id}'`);  // el id es el identificador de la estación
   return NextResponse.json({
     success: true,
-    results: dispositivos,
+    results: nscl,
   });
 }

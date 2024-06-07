@@ -18,6 +18,8 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
     id: 0, // Identifica el NSCL estamos editando
   });
 
+  const [instrumentos, setInstrumentos] = useState("");
+
   const [datos, setDatos] = useState({  // de un solo registro en cuestión
     id_nscl: "",
     codigo_localizacion: "",
@@ -36,7 +38,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
     tipo_adquisicion: "",
     estado: "",
     comentarios: "",
-    estacion: id, // llave foranea que conecta al dispositivo con la estación
+    estacion: id, // llave foranea que conecta al nscl con la estación
   });
 
   const [nuevaFila, setNuevaFila] = useState(false);
@@ -45,7 +47,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
     if (busqueda.length > 0) {
       setFiltro([
         ...nscls.filter((q) =>
-          q.digitalizador.toLowerCase().includes(busqueda.toLowerCase())
+          q.instrumento.toLowerCase().includes(busqueda.toLowerCase())
         ),
       ]);
     }
@@ -88,13 +90,25 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
     })
   };
 
-  // Función para llamar a los dispositivos de la base de datos
-  const obtenerDispositivos = async () => {
-    const response = await fetch("/api/nscls/get/" + id);  // el id es el identificador de la estación
+  //Función para llamar a los distintos tipos de instrumentos de la tabla de dispositivos de la base de datos
+  const obtenerInstrumentos = async () => {
+    const response = await fetch("/api/dispositivos/getsubgrupos/" + id);  // el id es el identificador de la estación
     await response
       .json()
       .then((res) => {
-        console.log("res", res);
+        //console.log("res", res.results);
+        setInstrumentos(res.results);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  // Función para llamar a los Nscls de la base de datos
+  const obtenerNscls = async () => {
+    const response = await fetch("/api/nscl/get/" + id);  // el id es el identificador de la estación
+    await response
+      .json()
+      .then((res) => {
+        //console.log("res", res);
         setNscls(res.results);
       })
       .catch((err) => console.error(err));
@@ -162,7 +176,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   // Función para actulizar la base de datos
   const handleUpdateBD = (e) => {
-    fetch(ENV.URLBASE + "api/nscls/update", {
+    fetch(ENV.URLBASE + "api/nscl/update", {
       method: "PUT",
       body: JSON.stringify({
         id_nscl: datos.id_nscl,
@@ -199,8 +213,8 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
     alert("Información actualizada");
   };
 
-  // Función para crear nuevo dispositivo en la Base de datos
-  const handleNuevoDispositivo = () => {
+  // Función para crear nuevo NSCL en la Base de datos
+  const handleNuevoNscl = () => {
 
     // Comprobamos que hay datos para insertar
     const comprobar = comprobarDatosGuardar();
@@ -211,8 +225,8 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
         const guadar = confirm("¿Deseas guardar los datos?");
         if (guadar) {
-          // Crear dispositivo en la BD
-          const response = fetch(ENV.URLBASE + "api/nscls/create", {
+          // Crear NSCL en la BD
+          const response = fetch(ENV.URLBASE + "api/nscl/create", {
             method: "POST",
             body: JSON.stringify({
               id_nscl: datos.id_nscl,
@@ -283,7 +297,13 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
   // Función para comprobar si hay campos vacios
   function comprobarCamposVacios() {
     let comprobar = false;
-    if (datos.instrumento != "" && datos.sensor != "" && datos.digitalizador != "") {
+    
+  //  NO ESTA GUARDANDO ES COMO SI NO LLEGARA NADA A datos
+  //  HAY QUE HACER EL DELETE TAMBIÉN
+
+    console.log("datos instrumentooooooo", datos.instrumento)
+
+    if (datos.instrumento != "" && datos.sensor != "" && datos.digitalizador != "" && datos.transmision != "") {
       comprobar = true;
     }
     return comprobar;
@@ -304,6 +324,10 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
     }
     return comprobar;
   }
+
+  useEffect(() => {
+    obtenerInstrumentos();
+  }, [])
 
   useEffect(() => {
     console.log(nscls);
@@ -335,7 +359,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
           type="search"
           id="default-search"
           className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-          placeholder="Buscar nscl por Digitalizador"
+          placeholder="Buscar NSCL por instrumento"
           value={busqueda}
           onChange={(e) => {
             setBusqueda(e.target.value);
@@ -362,6 +386,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
               <th>Fecha de finalización</th> */}
               <th>Sensor</th>
               <th>Digitalizador</th>
+              <th>Transmisión</th>
               {/* <th>Almacenamiento</th>
               <th>Condición de instalación</th>
               <th>Transmisión</th>
@@ -413,20 +438,6 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
                 {/* Registros */}
 
-                {/* <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="id_dispositivo"
-                      value={datos.id_dispositivo}
-                      onChange={handleHacerCambios}
-                    />
-                  ) : (
-                    <>{dispositivo.id_dispositivo}</>
-                  )}
-                </td> */}
-
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
                     <input
@@ -443,13 +454,20 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
-                    <input
+
+                    <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
                       name="instrumento"
-                      value={datos.instrumento}
+                      value={(datos != null) ? datos.instrumento : ""}
                       onChange={handleHacerCambios}
-                    />
+                    >
+                      {/* options */}
+                      {instrumentos.map((inst, index) => (
+                        <option key={index} value={inst.subgrupo}>{inst.subgrupo}</option>
+                      ))}
+
+                    </select>
+
                   ) : (
                     <>{nscl.instrumento}</>
                   )}
@@ -488,10 +506,27 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
-                      name="estado"
-                      value={datos.estado}
+                      name="transmision"
+                      value={datos.transmision}
                       onChange={handleHacerCambios}
                     />
+                  ) : (
+                    <>{nscl.transmision}</>
+                  )}
+                </td>
+
+                <td>
+                  {editando.estado && editando.id === nscl.id_nscl ? (
+                    <select
+                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                      name="estado"
+                      value={(datos != null) ? datos.estado : ""}
+                      onChange={handleHacerCambios}
+                    >
+                      <option value="0">..........................................</option>
+                      <option value="Activa">Activa</option>
+                      <option value="Inactiva">Inactiva</option>
+                    </select>
                   ) : (
                     <>{nscl.estado}</>
                   )}
@@ -499,10 +534,10 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
-                    <input
+                    <textarea
+                      name="comentarios" rows="4" cols="40"
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
-                      name="comentarios"
                       value={datos.comentarios}
                       onChange={handleHacerCambios}
                     />
@@ -515,9 +550,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
             ))}
 
-
-
-
+            {/* para nuevo NSCL */}
             {nuevaFila ? (
               <>
                 <tr>
@@ -525,7 +558,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                   <td>
                     <button
                       className="btn-save"
-                      onClick={handleNuevoDispositivo}
+                      onClick={handleNuevoNscl}
                       title="Editar/Guardar"
                     >
                       <SaveIcon className="w-5 h-5 text-white" />
@@ -536,107 +569,11 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                     {" "}
                   </td>
 
-                  {/* <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="id_dispositivo"
-                      onChange={handleHacerCambios}
-                      required
-                    />
-                  </td> */}
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="grupo"
-                      onChange={handleHacerCambios}
-                      required
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="INSTRUMENTACIÓN">INSTRUMENTACIÓN</option>
-                      <option value="SISTEMA ELECTRICO">SISTEMA ELECTRICO</option>
-                      <option value="TELECOMUNICACIONES">TELECOMUNICACIONES</option>
-                      <option value="ACCESORIOS">ACCESORIOS</option>
-                      <option value="EQUIPO DE SEGUIMIENTO">EQUIPO DE SEGUIMIENTO</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="subgrupo"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="DIGITALIZADOR">DIGITALIZADOR </option>
-                      <option value="SISMÓMETRO DE BANDA ANCHA">SISMÓMETRO DE BANDA ANCHA</option>
-                      <option value="INCLINÓMETRO">INCLINÓMETRO </option>
-                      <option value="PANEL SOLAR">PANEL SOLAR</option>
-                      <option value="ANTENA GNSS">ANTENA GNSS</option>
-                      <option value="RECEPTOR GNSS">RECEPTOR GNSS </option>
-                      <option value="REGULADOR DC">REGULADOR DC</option>
-                      <option value="CONTROLADOR DE CARGA">CONTROLADOR DE CARGA</option>
-                      <option value="ANTENA">ANTENA</option>
-                      <option value="SWITCH">SWITCH</option>
-                      <option value="SENSOR DE INFRASONIDO">SENSOR DE INFRASONIDO</option>
-                      <option value="CÁMARA WEB">CÁMARA WEB</option>
-                      <option value="TERMOCUPLA">TERMOCUPLA</option>
-                      <option value="GABINETE DE ACERO">GABINETE DE ACERO</option>
-                      <option value="TELESCOPIO">TELESCOPIO</option>
-                      <option value="FIBRA ÓPTICA">FIBRA ÓPTICA</option>
-                      <option value="ESPECTRÓMETRO">ESPECTRÓMETRO</option>
-                      <option value="PC INTREGRADO">PC INTREGRADO</option>
-                      <option value="ANTENA DE GPS">ANTENA DE GPS</option>
-                      <option value="SISMOMETRO/DIGITALIZADOR">SISMOMETRO/DIGITALIZADOR</option>
-                      <option value="SISMÓMETRO CORTO PERIODO TRIAXIAL">SISMÓMETRO CORTO PERIODO TRIAXIAL</option>
-                      <option value="BASE NIVELANTE">BASE NIVELANTE</option>
-                      <option value="SENSOR DE RADÓN">SENSOR DE RADÓN</option>
-                      <option value="RADIO">RADIO</option>
-                      <option value="ELEVADOR POE">ELEVADOR POE</option>
-                      <option value="ACELERÓMETRO/DIGITALIZADOR">ACELERÓMETRO/DIGITALIZADOR</option>
-                      <option value="MAGNETÓMETRO">MAGNETÓMETRO</option>
-                      <option value="DIGITALIZADOR">DIGITALIZADOR</option>
-                      <option value="PLUVIÓMETRO">PLUVIÓMETRO</option>
-                      <option value="BATERIA">BATERIA</option>
-                      <option value="ANALIZADOR DE ESPECTRO">ANALIZADOR DE ESPECTRO</option>
-                      <option value="SCANDOAS">SCANDOAS</option>
-                    </select>
-                  </td>
-
                   <td>
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
-                      name="serial"
-                      onChange={handleHacerCambios}
-                      required
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="placa"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="codigo_bidimensional"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="secuencia"
+                      name="codigo_localizacion"
                       onChange={handleHacerCambios}
                     />
                   </td>
@@ -644,65 +581,13 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                   <td>
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="marca"
+                      name="instrumento"
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
-                      <option value="GURALP">GURALP</option>
-                      <option value="NANOMETRICS">NANOMETRICS</option>
-                      <option value="APPLIED GEOMECHANICS">APPLIED GEOMECHANICS</option>
-                      <option value="ZYTECH">ZYTECH</option>
-                      <option value="FREEWAVE">FREEWAVE</option>
-                      <option value="TRIMBLE">TRIMBLE</option>
-                      <option value="EVER EXCEED">EVER EXCEED</option>
-                      <option value="MORNINGSTAR">MORNINGSTAR</option>
-                      <option value="BRICK ELECTRIC">BRICK ELECTRIC</option>
-                      <option value="PCTEL BLUEWAVE">PCTEL BLUEWAVE</option>
-                      <option value="3ONEDATA">3ONEDATA</option>
-                      <option value="TOPCON">TOPCON</option>
-                      <option value="CHAPARRAL PHYSICS">CHAPARRAL PHYSICS</option>
-                      <option value="PEIMAR">PEIMAR</option>
-                      <option value="TRACER SERIES/EPEVER">TRACER SERIES/EPEVER</option>
-                      <option value="SIXNET">SIXNET</option>
-                      <option value="VIVOTEC">VIVOTEC</option>
-                      <option value="JEWELL">JEWELL</option>
-                      <option value="SOLARTECH">SOLARTECH</option>
-                      <option value="BP SOLAR">BP SOLAR</option>
-                      <option value="KYOCERA">KYOCERA</option>
-                      <option value="XETAWAVE ">XETAWAVE </option>
-                      <option value="GAMATEC">GAMATEC</option>
-                      <option value="EPEVER">EPEVER</option>
-                      <option value="OMEGA">OMEGA</option>
-                      <option value="NUDAM">NUDAM</option>
-                      <option value="UBIQUITI">UBIQUITI</option>
-                      <option value="NO TIENE">NO TIENE</option>
-                      <option value="CHALMERS">CHALMERS</option>
-                      <option value="OCEAN OPTICS">OCEAN OPTICS</option>
-                      <option value="GLOBALSAT">GLOBALSAT</option>
-                      <option value="SILICON SOLAR">SILICON SOLAR</option>
-                      <option value="SERCEL">SERCEL</option>
-                      <option value="INTUICOM">INTUICOM</option>
-                      <option value="LARSEN">LARSEN</option>
-                      <option value="DAHUA">DAHUA</option>
-                      <option value="MARPED MANUFACTURAS">MARPED MANUFACTURAS</option>
-                      <option value="REFTEK">REFTEK</option>
-                      <option value="BASE NIVELANTE">BASE NIVELANTE</option>
-                      <option value="ALGADE">ALGADE</option>
-                      <option value="CANADIAN SOLAR">CANADIAN SOLAR</option>
-                      <option value="MOXA">MOXA</option>
-                      <option value="AIR 802">AIR 802</option>
-                      <option value="SCHÜLER WEAGE">SCHÜLER WEAGE</option>
-                      <option value="SENSYS / STEFAN MAYER INSTRUMENTS">SENSYS / STEFAN MAYER INSTRUMENTS</option>
-                      <option value="STC">STC</option>
-                      <option value="WALEKER">WALEKER</option>
-                      <option value="SGC">SGC</option>
-                      <option value="POWER OVER ETHERNET">POWER OVER ETHERNET</option>
-                      <option value="SOLAREX">SOLAREX</option>
-                      <option value="VISION">VISION</option>
-                      <option value="ANRITSU">ANRITSU</option>
-                      <option value="GEÓNICA">GEÓNICA</option>
-                      <option value="SINCLAIR">SINCLAIR</option>
-                      <option value="SURSUM">SURSUM</option>
+                      {/* options */}
+                      {instrumentos.map((inst, index) => (
+                        <option key={index} value={inst.subgrupo}>{inst.subgrupo}</option>
+                      ))}
                     </select>
                   </td>
 
@@ -710,7 +595,25 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
-                      name="modelo"
+                      name="sensor"
+                      onChange={handleHacerCambios}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                      type="text"
+                      name="digitalizador"
+                      onChange={handleHacerCambios}
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                      type="text"
+                      name="transmision"
                       onChange={handleHacerCambios}
                     />
                   </td>
@@ -722,149 +625,16 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                       onChange={handleHacerCambios}
                     >
                       <option value="0">..........................................</option>
-                      <option value="EN DIAGNOSTICO">EN DIAGNOSTICO</option>
-                      <option value="FUNCIONAL">FUNCIONAL</option>
-                      <option value="EN TRANSITO">EN TRANSITO</option>
+                      <option value="Activa">Activa</option>
+                      <option value="Inactiva">Inactiva</option>
                     </select>
                   </td>
 
                   <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="propietario"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="SGC">SGC</option>
-                      <option value="ALCALDIA PASTO">ALCALDIA PASTO</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="proveedor"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="AMPERE">AMPERE</option>
-                      <option value="SANDOX">SANDOX</option>
-                      <option value="DATUM INGENIERÍA SAS">DATUM INGENIERÍA SAS</option>
-                      <option value="DIRIMPEX SAS">DIRIMPEX SAS</option>
-                      <option value="GEOSYSTEM INGENIERÍA SAS">GEOSYSTEM INGENIERÍA SAS</option>
-                      <option value="SANDOX">SANDOX</option>
-                      <option value="SSI">SSI</option>
-                      <option value="CHALMERS">CHALMERS</option>
-                      <option value="METRICOM">METRICOM</option>
-                      <option value="SIN PROVEEDOR">SIN PROVEEDOR</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="responsable"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="SERVICIO GEOLOGICO COLOMBIANO">SERVICIO GEOLOGICO COLOMBIANO</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="lugar"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="LABORATORIO ELECTRONICA">LABORATORIO ELECTRONICA</option>
-                      <option value="ESTACION">ESTACION</option>
-                      <option value="BODEGA ELECTRONICA">BODEGA ELECTRONICA</option>
-                      <option value="BODEGA DEFORMACIÓN">BODEGA DEFORMACIÓN</option>
-                    </select>
-                  </td>
-
-                  {/* <td>
-                    <input
-                      type="text"
-                      name="estacion"
-                      onChange={handleHacerCambios}
-                    />
-                  </td> */}
-
-                  <td>
-                    <input
-                      type="date"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="fecha_mantenimiento"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      type="date"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="fecha_instalacion"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="date"
-                      name="fecha_retiro"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="date"
-                      name="fecha_recepcion"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="date"
-                      name="fecha_baja"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="inventariado"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="Inventariado">Inventariado</option>
-                      <option value="No Inventariado">No Inventariado</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <input
-                      type="date"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="fecha_inventariado"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <textarea name="comentarios" rows="4" cols="40"
+                    <textarea
+                      name="comentarios" rows="4" cols="40"
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
-                      id="comentarios"
-                      placeholder="Escriba un comentario"
                       onChange={handleHacerCambios}
                     />
                   </td>
@@ -877,11 +647,11 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
           </tbody>
         </table>
       ) : (
-        <h3>No hay dispositivos.</h3>
+        <h3>No hay NSCLs.</h3>
       )}
 
       <button className="btn-create" onClick={handleNuevaFila}>
-        Crear dispositivo
+        Crear NSCL
       </button>
 
     </>

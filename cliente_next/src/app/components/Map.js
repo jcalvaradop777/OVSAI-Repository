@@ -7,8 +7,16 @@ import "@maptiler/sdk/dist/maptiler-sdk.css";
 import IngresarEstacion from "./Estaciones/FrmIngresarEstacion";
 import MenuContext from "./Estaciones/MenuCtx";
 
-export default function Map({Modal, setModal, _Map, _setMap, selected, setSelected, setShow, show,}) {
-  
+export default function Map({
+  Modal,
+  setModal,
+  _Map,
+  _setMap,
+  selected,
+  setSelected,
+  setShow,
+  show,
+}) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const ovspa = { lng: -77.253837, lat: 1.209139 }; // posición del observatorio vulcanológico de Pasto
@@ -31,8 +39,9 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
   // Obtener icono marcador
 
   const obtenerIconoMarcador = () => {
-    const icon =  // icono de lacasia que representa la estación
-       `<svg
+    const icon =
+      // icono de lacasia que representa la estación
+      `<svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -46,7 +55,7 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
             stroke-linejoin="round"
             d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
           />
-        </svg>`
+        </svg>`;
 
     return icon;
   };
@@ -86,13 +95,18 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
                     el.className = "w-auto h-auto";
                     el.innerHTML = obtenerIconoMarcador();
                     el.style.borderRadius = "50%";
-                    el.style.backgroundColor = "#fff";  // aqui se cambia el color de fondo de los iconos de cada estación
+                    el.style.backgroundColor = "#fff"; // aqui se cambia el color de fondo de los iconos de cada estación
                     el.style.padding = "5px";
+                    el.setAttribute("data-id", mark.id);
 
                     // Información emergente del icono de cada estación
                     const marker = new maptilersdk.Marker({ element: el })
                       .setLngLat([mark.longitud, mark.latitud])
-                      .setPopup(new maptilersdk.Popup().setHTML(`Estación: ${mark.nombre}<br> Longitud: ${mark.longitud}<br> Latitud: ${mark.latitud}`))
+                      .setPopup(
+                        new maptilersdk.Popup().setHTML(
+                          `Estación: ${mark.nombre}<br> Longitud: ${mark.longitud}<br> Latitud: ${mark.latitud}`
+                        )
+                      )
                       .addTo(map.current);
 
                     // Opciones al hacer clic derecho a los marcadores
@@ -110,7 +124,7 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
                         x: x,
                         y: y,
                         visible: true,
-                        element: mark
+                        element: mark,
                       });
                     });
                     // ---
@@ -133,10 +147,9 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
 
       // ---
     }
-  }, [_Map.markers, _Map.reload, selected]);
+  });
 
   useEffect(() => {
- 
     if (selected === 2) {
       setModal({
         ...Modal,
@@ -150,7 +163,7 @@ export default function Map({Modal, setModal, _Map, _setMap, selected, setSelect
           />
         ),
       });
-    } 
+    }
 
     // ---
 

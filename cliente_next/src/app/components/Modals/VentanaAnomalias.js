@@ -1,4 +1,4 @@
-import {useState } from "react";
+import {useEffect, useState } from "react";
 import RenderAnomalias from "@/app/anomalias/page";
 
 // Este componente es una ventana modal que muestra los datos de Guralp como trazas
@@ -6,6 +6,15 @@ import RenderAnomalias from "@/app/anomalias/page";
 export default function VentanaAnomalias({ mostrarAnomalias, setAnomalias }) {
   
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
+
+  useEffect(() => {
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") {
+        setAnomalias(false);
+        setPantallaCompleta(false);
+      }
+    })
+  })
 
   return (
     <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">

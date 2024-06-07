@@ -104,7 +104,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
     await response
       .json()
       .then((res) => {
-        console.log("res", res);
+        //console.log("res", res);
         setDispositivos(res.results);
       })
       .catch((err) => console.error(err));
@@ -883,11 +883,6 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
               </tr>
 
             ))}
-
-
-
-
-
 
             {nuevaFila ? (
               <>

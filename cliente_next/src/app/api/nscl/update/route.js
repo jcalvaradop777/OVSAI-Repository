@@ -17,8 +17,8 @@ export async function PUT(req) {
       }
     }
 
-    const id = _object.id_dispositivo 
-    await updateDataInTable("dispositivos", updateSet, `id_dispositivo='${id}'`);
+    const id = _object.id_nscl
+    await updateDataInTable("nscl", updateSet, `id_nscl='${id}'`);
 
     return NextResponse.json({
       success: true,
