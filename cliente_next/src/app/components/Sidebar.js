@@ -20,7 +20,7 @@ export default function Sidebar({
   _setMap,
   selected,
   setSelected,
-  setShow
+  setShow,
 }) {
   const pathname = usePathname();
 
@@ -46,11 +46,15 @@ export default function Sidebar({
   const [estaciones, setEstaciones] = useState([]);
 
   useEffect(() => {
-    if(last != _Map.markers.length) {
-      obtenerEstaciones().then((res) => {
-        setEstaciones(res);
-        if(Array.isArray(res)) setLast(res.length);
-      }).catch((err) => console.error(err));
+    if (_Map != null || _Map != undefined) {
+      if (last != _Map.markers.length) {
+        obtenerEstaciones()
+          .then((res) => {
+            setEstaciones(res);
+            if (Array.isArray(res)) setLast(res.length);
+          })
+          .catch((err) => console.error(err));
+      }
     }
   }, [_Map, last]);
 
@@ -76,7 +80,6 @@ export default function Sidebar({
                   <span>Estaciones</span>
                 </summary>
                 <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
-
                   {/* Icono gris de estación (casita) de la barra izquierda */}
                   <li
                     className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${
@@ -101,7 +104,9 @@ export default function Sidebar({
                         ),
                       });
                     }}
-                    title={"Haga clic aquí y posteriormente en el mapa para crear una Estación"}
+                    title={
+                      "Haga clic aquí y posteriormente en el mapa para crear una Estación"
+                    }
                     data-type="2"
                   >
                     <div
@@ -110,14 +115,18 @@ export default function Sidebar({
                     ></div>
                     <span style={{ color: "gray" }}>
                       <HomeIcon className="w-full h-auto" />
-                      <div style={{textAlign: 'center'}}>
+                      <div style={{ textAlign: "center" }}>
                         <span className="text-black">Crear</span>
                       </div>
                     </span>
                   </li>
                 </ul>
               </details>
-              <FiltrosEstaciones datos={estaciones} setEstaciones={setEstaciones} campos={["id", "nombre"]} />
+              <FiltrosEstaciones
+                datos={estaciones}
+                setEstaciones={setEstaciones}
+                campos={["id", "nombre"]}
+              />
             </>
           ) : (
             <Link
