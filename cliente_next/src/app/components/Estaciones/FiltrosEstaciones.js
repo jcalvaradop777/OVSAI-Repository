@@ -166,8 +166,7 @@ export default function FiltrosEstaciones({
                 }, 2000);
               }} href={`#19/${r.latitud}/${r.longitud}`} key={"result-" + i}>
                 <li className="w-full h-auto p-2 cursor-pointer select-none border-solid border-slate-100 border-[1px]">
-                Nombre: {r.nombre}
-                <br />
+                Estación: {r.nombre} <br />
                 Latitud: {r.latitud} <br />
                 Longitud: {r.longitud}
               </li>

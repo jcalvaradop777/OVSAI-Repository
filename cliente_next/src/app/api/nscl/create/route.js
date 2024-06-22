@@ -14,11 +14,11 @@ export async function POST(req) {
 
     console.log(data);
 
-    await insertDataIntoTable("dispositivos", names, values);
+    await insertDataIntoTable("nscl", names, values);
 
     return NextResponse.json({
       success: true,
-      message: "El dispositivo se ha creado correctamente!",
+      message: "El NSCL se ha creado correctamente!",
     });
   } catch (error) {
     return NextResponse.json({

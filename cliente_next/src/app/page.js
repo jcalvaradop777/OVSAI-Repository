@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar";
 
 import { usePathname, useRouter } from "next/navigation";
 import Volcan from "./volcan/page";
+import Dashboard from "./pages/Dashboard/page";
 
 export default function Home() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function Home() {
     const pathname = usePathname();
     switch (pathname) {
       case "/":
-        return <h1>.:.OVASI.:.</h1>
+        return <Dashboard />
       case "/volcan":
         return (
           <Volcan />
