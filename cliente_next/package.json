@@ -2,7 +2,7 @@
   "name": "volcan_cesteamup",
   "version": "0.1.0",
   "private": true,
-  "scripts": {    
+  "scripts": {
     "dev": "node server.js",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
@@ -12,7 +12,10 @@
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@maptiler/sdk": "^1.2.1",
+    "@nextui-org/react": "^2.4.2",
     "axios": "^1.6.8",
+    "faker": "^6.6.6",
+    "framer-motion": "^11.2.11",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
     "mongoose": "^8.3.2",
@@ -20,6 +23,7 @@
     "next": "14.1.2",
     "plotly.js": "^2.30.0",
     "react": "^18",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.22.3",
@@ -28,6 +32,7 @@
     "sort-by": "^1.2.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.2",

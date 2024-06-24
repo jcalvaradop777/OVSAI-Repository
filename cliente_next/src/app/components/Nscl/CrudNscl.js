@@ -116,7 +116,8 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   // Nueva Fila
   const handleNuevaFila = () => {
-    setNuevaFila(true);
+    setNuevaFila((prev) => prev = true);    
+    console.log(nuevaFila);
   }
 
   const resetearDatos = () => {
@@ -156,7 +157,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            id_nscl: dispositivo.id_nscl,
+            id_nscl: nscl.id_nscl,
           }),
         }
       );
@@ -175,8 +176,8 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
   };
 
   // Función para actulizar la base de datos
-  const handleUpdateBD = (e) => {
-    fetch(ENV.URLBASE + "api/nscl/update", {
+  const handleUpdateBD = async (e) => {
+    await fetch(ENV.URLBASE + "api/nscl/update", {
       method: "PUT",
       body: JSON.stringify({
         id_nscl: datos.id_nscl,
@@ -202,6 +203,10 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+    }).then(async (res) => {
+      console.log(await res.json());
+    }).catch((err) => {
+      console.error(err);
     });
 
     obtenerNscls();
@@ -370,8 +375,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
       </div>
 
 
-      {/* Tabla */}
-      {nscls != null && nscls.length > 0 ? (
+      {/* Tabla */}      
         <table>
           <thead>
             <tr>
@@ -401,7 +405,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
           </thead>
 
           <tbody>
-            {filtro.map((nscl, i) => (
+          {nscls != null && nscls.length > 0 ? ( filtro.map((nscl, i) => (
               <tr key={"nscl-" + i}>
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
@@ -548,7 +552,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
               </tr>
 
-            ))}
+            ))) : (<></>)} 
 
             {/* para nuevo NSCL */}
             {nuevaFila ? (
@@ -646,9 +650,6 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
             )}
           </tbody>
         </table>
-      ) : (
-        <h3>No hay NSCLs.</h3>
-      )}
 
       <button className="btn-create" onClick={handleNuevaFila}>
         Crear NSCL

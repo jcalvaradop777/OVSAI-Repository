@@ -20,7 +20,7 @@ export default function Sidebar({
   _setMap,
   selected,
   setSelected,
-  setShow
+  setShow,
 }) {
   const pathname = usePathname();
 
@@ -60,7 +60,7 @@ export default function Sidebar({
 
   return (
     <>
-      <div className="relative flex flex-col bg-clip-border bg-white text-gray-700 h-[calc(100vh)] max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 z-50">
+      <div className="fixed flex flex-col bg-clip-border bg-white text-gray-700 h-[calc(100vh)] max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 z-50">
         <div className="flex items-center justify-center">
           <img src="logoSgc2.jpg" className="w-64 h-auto" />
         </div>
@@ -72,6 +72,12 @@ export default function Sidebar({
         </div>
 
         <nav className="flex flex-col gap-1 w-full p-2 font-sans text-base font-normal text-gray-700">
+          <Link
+            href={"/"}
+            className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+          >
+            Inicio
+          </Link>
           {pathname === "/volcan" ? (
             <>
               {/* Estaciones*/}
@@ -80,7 +86,6 @@ export default function Sidebar({
                   <span>Estaciones</span>
                 </summary>
                 <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
-
                   {/* Icono gris de estación (casita) de la barra izquierda */}
                   <li
                     className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${
@@ -105,7 +110,9 @@ export default function Sidebar({
                         ),
                       });
                     }}
-                    title={"Haga clic aquí y posteriormente en el mapa para crear una Estación"}
+                    title={
+                      "Haga clic aquí y posteriormente en el mapa para crear una Estación"
+                    }
                     data-type="2"
                   >
                     <div
@@ -114,15 +121,18 @@ export default function Sidebar({
                     ></div>
                     <span style={{ color: "gray" }}>
                       <HomeIcon className="w-full h-auto" />
-                      <div style={{textAlign: 'center'}}>
+                      <div style={{ textAlign: "center" }}>
                         <span className="text-black">Crear</span>
                       </div>
                     </span>
                   </li>
                 </ul>
-              
-              <FiltrosEstaciones datos={estaciones} setEstaciones={setEstaciones} campos={["id", "nombre"]} />
-              
+
+                <FiltrosEstaciones
+                  datos={estaciones}
+                  setEstaciones={setEstaciones}
+                  campos={["id", "nombre"]}
+                />
               </details>
             </>
           ) : (

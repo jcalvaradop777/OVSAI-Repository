@@ -1,4 +1,5 @@
-import './globals.css';
+import { NextUIProvider } from "@nextui-org/react";
+import "./globals.css";
 
 export const metadata = {
   title: "OVSAI",
@@ -6,9 +7,11 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
- return (
+  return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <NextUIProvider>{children}</NextUIProvider>
+      </body>
     </html>
-  )
+  );
 }
