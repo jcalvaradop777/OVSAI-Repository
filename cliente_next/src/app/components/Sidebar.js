@@ -2,6 +2,7 @@
 
 import {
   BuildingLibraryIcon,
+  ChatBubbleOvalLeftIcon,
   HomeIcon,
   InboxIcon,
 } from "@heroicons/react/20/solid";
@@ -13,6 +14,7 @@ import Estacion from "./Estaciones/FrmIngresarEstacion";
 import FiltrosEstaciones from "./Estaciones/FiltrosEstaciones";
 import { ENV } from "@/config/env";
 import { useEffect, useState } from "react";
+import { runOVSAIBot } from "@/OVSAIBot";
 export default function Sidebar({
   Modal,
   setModal,
@@ -35,6 +37,8 @@ export default function Sidebar({
       // Si vuelve a dar clic y es igual al valor guardado, se deselecciona
       setSelected((value) => (value = 0));
     }
+
+    console.log("ok");
   };
 
   const obtenerEstaciones = async () => {
@@ -44,6 +48,46 @@ export default function Sidebar({
 
   const [last, setLast] = useState(null);
   const [estaciones, setEstaciones] = useState([]);
+  const [chat, setChat] = useState(false);
+  const [mensajes, setMensajes] = useState([]);
+  const [mensaje, setMsg] = useState("");
+
+  const handleEnviarMensaje = () => {
+    const obtenerBox = document.querySelector("#mensajes-chat");
+    if (mensaje.trim().length > 0) {
+      setMensajes((lastMessags) => [
+        ...lastMessags,
+        {
+          rol: "user",
+          msg: mensaje,
+        },
+      ]);
+
+      // Hacer la pregunta
+
+      runOVSAIBot(mensaje)
+        .then((res) => {
+          setMensajes((lastMessags) => [
+            ...lastMessags,
+            {
+              rol: "chat",
+              msg: res,
+            },
+          ]);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+
+      // Eliminar mensaje de la caja de texto
+      setMsg("");
+
+      console.log(mensajes);
+
+      obtenerBox.scrollIntoView({ behavior: "smooth" });
+      obtenerBox.scrollTop = obtenerBox.scrollHeight;
+    }
+  };
 
   useEffect(() => {
     if (_Map != null || _Map != undefined) {
@@ -155,14 +199,63 @@ export default function Sidebar({
           </Link>
         </div>
         */}
-
         <Link
-          href={"/chat"}
+          href={"/snmp"}
           className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
         >
-          Chat
+          SNMP
         </Link>
       </div>
+      <button
+        className="fixed w-10 h-10 left-[300px] bottom-2 z-[2000]  text-[#82A53D] hover:animate-pulse hover:w-12 hover:h-12"
+        onClick={() => {
+          setChat(!chat);
+        }}
+      >
+        <ChatBubbleOvalLeftIcon width={36} height={36} />
+      </button>
+      {chat ? (
+        <div className="absolute w-72 h-96 p-0 left-[350px] bottom-2 box-border bg-slate-200 z-[2000]">
+          <section className="relative w-full box-border p-2 bg-[#82A53D]">
+            OVSAIBot
+          </section>
+          <section
+            id="mensajes-chat"
+            className="relative flex flex-col gap-1 w-full box-border overflow-y-auto p-2 h-72"
+          >
+            {mensajes.map((m, i) => (
+              <div
+                key={`msgChat-${i}`}
+                className={`w-full ${
+                  m.rol === "user"
+                    ? "bg-slate-300 text-black"
+                    : "bg-[#82A53D] text-black"
+                } p-2 box-border`}
+              >
+                {m.msg}
+              </div>
+            ))}
+          </section>
+          <section className="relative w-full box-border p-0 h-4">
+            <input
+              type="text"
+              placeholder="Mensaje"
+              onChange={(e) => {
+                setMsg(e.target.value);
+              }}
+              value={mensaje}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleEnviarMensaje();
+                }
+              }}
+              className="w-full h-auto p-2 cursor-text border-gray-700 text-black focus:outline-0"
+            />
+          </section>
+        </div>
+      ) : (
+        <></>
+      )}
     </>
   );
 }

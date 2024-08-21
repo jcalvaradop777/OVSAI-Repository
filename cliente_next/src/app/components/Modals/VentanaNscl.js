@@ -5,9 +5,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingInIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingOutIcon } from "@heroicons/react/20/solid";
 
-export default function VentanaIngresarDispositivo({ id, mostrar }) {
-
-  const [show, setShow] = useState(false);
+export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar, element }) {
   const [load, setLoad] = useState(false);
   const [nscls, setNscls] = useState([]);
   const [actualizarNscls, setActualizarNscls] = useState(false);
@@ -26,7 +24,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
 
   useEffect(() => {
     if (!load) {
-      setShow(mostrar);
+      setMostrar(mostrar);
       setLoad(true);
     }
 
@@ -38,7 +36,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
 
   return (
     <>
-      {show ? (
+      {mostrar ? (
         <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
 
           <div
@@ -67,7 +65,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
                 type="button"
                 className="btn-close"
                 onClick={() => {
-                  setShow(false);
+                  setMostrar(false);
                 }}
               >
                 <XMarkIcon  // icono cerrar
@@ -87,6 +85,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
                     nscls={nscls}
                     setNscls={setNscls}
                     id={id} // el id es el identificador de la estación
+                    element={element}
                   />
                 </section>
               </div>

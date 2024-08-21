@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+
+from .agenteChat import AgenteChat
 from .agenteInclinometroGuralp import openGcf, graficaOriginal, getFigurasUnaTraza, getFigVariasTrazasUnificadas, getSubfoldersNames, getFilesNames, getAnomalias
 #import agenteInclinometroGuralp as agenteIncGur
 from django.shortcuts import render
@@ -6,8 +8,16 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+import spade
+from spade import wait_until_finished
+from spade.agent import Agent
+from spade.behaviour import OneShotBehaviour
+from spade.message import Message
+from spade.template import Template
+
 #rutaGcf = "D:/SGC/GCF/"
-rutaGcf = "X:/"
+#rutaGcf = "X:/"
+rutaGcf = "D:/Volcan-Project/gcf/"
 rutaGcfFecha = ""
 rutaGcfFechaSubfolder = ""
 rutaGcfFechaSubfolderFile = ""
@@ -26,8 +36,9 @@ def fecha2Subfolders(request):
             anio = partes[0]
             mes = partes[1]
             rutaGcfFecha = rutaGcf + anio + "/" + mes + "/"
+            print("showRuta: ", rutaGcfFecha)
             subfoldersNames = getSubfoldersNames(rutaGcfFecha)
-            #print("subfolder_names: ", subfoldersNames)
+            print("subfolder_names: ", subfoldersNames)
             return JsonResponse(subfoldersNames)
         except json.JSONDecodeError:
             pass
@@ -174,9 +185,18 @@ def trazaAntes(request):
     
     return render(request, 'guralp.html', context)
 
-
-async def chat(request):
+def chat(request):
     # agChat = agenteChat.ReceiverAgent("ovsai@magicbroccoli.de", "87065333")
     # await agChat.start(auto_register=True)
 
-    return render(request, 'chat.html')
+    async def chatMessage():
+        senderagent = AgenteChat("rxworld@deshalbfrei.org", "Lenuxinc2024*")
+        await senderagent.start(auto_register=True)
+        await spade.wait_until_finished(senderagent)
+        #senderagent.start()
+    print("Agents finished")
+
+    
+    spade.run(chatMessage())
+
+    # return render(request, 'chat.html')

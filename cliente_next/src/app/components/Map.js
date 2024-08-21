@@ -61,21 +61,19 @@ export default function Map({
   };
 
   useEffect(() => {
-
     if (_Map.reload) {
-
       // Eliminar marcadores
 
       if (Array.isArray(_Map.markers) && _Map.markers.length > 0) {
         _setMap({
           ...Map,
-          markers: []
-        })
+          markers: [],
+        });
       }
       const getMarkers = document.querySelectorAll(".maplibregl-marker");
-      if(getMarkers.length > 0) {
-        for(let m of getMarkers) {
-          if(m) m.remove();
+      if (getMarkers.length > 0) {
+        for (let m of getMarkers) {
+          if (m) m.remove();
         }
       }
 
@@ -134,7 +132,6 @@ export default function Map({
                       markers: [marker, ..._Map.markers],
                       reload: false,
                     });
-
                   }
                 });
               }
@@ -184,7 +181,7 @@ export default function Map({
           element: null,
         });
 
-        if (selected !== 0) {
+        //if (selected !== 0) {
           _setMap({
             ..._Map,
             _data: {
@@ -194,7 +191,7 @@ export default function Map({
           });
 
           openModal();
-        }
+        //}
 
         if (selected === 0) {
           setShow(false);
@@ -225,20 +222,16 @@ export default function Map({
 
   return (
     <div className="w-full h-screen absolute top-0 m-0">
-      {Mposition.visible ? (
-        <MenuContext
-          Mposition={Mposition}
-          setMPosition={setMposition}
-          Modal={Modal}
-          setModal={setModal}
-          _Map={_Map}
-          _setMap={_setMap}
-          setSelected={setSelected}
-          setShow={setShow}
-        />
-      ) : (
-        <></>
-      )}
+      <MenuContext
+        Mposition={Mposition}
+        setMPosition={setMposition}
+        Modal={Modal}
+        setModal={setModal}
+        _Map={_Map}
+        _setMap={_setMap}
+        setSelected={setSelected}
+        setShow={setShow}
+      />
       <div ref={mapContainer} className={`w-full h-screen relative`} />
     </div>
   );

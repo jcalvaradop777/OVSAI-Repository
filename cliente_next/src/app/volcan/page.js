@@ -7,6 +7,7 @@ import ListSearch from "../components/ListSearch";
 
 import { usePathname, useRouter } from "next/navigation";
 import Basic from "../components/Modals/Basic";
+import SNMPDispositivo from "../snmp/page";
 
 export default function Volcan() {
   const [volcanes] = useState([
@@ -68,6 +69,8 @@ export default function Volcan() {
             show={show}
           />
         );
+      case "/snmp":
+        return <SNMPDispositivo />;
       default:
         return <h1>No encontrado</h1>;
     }

@@ -1,4 +1,4 @@
-from .views import trazas, fecha2Subfolders, nombresArchivos, anomalias
+from .views import trazas, fecha2Subfolders, nombresArchivos, anomalias, chat
 from django.urls import path, include
 from rest_framework import routers
 
@@ -7,4 +7,5 @@ urlpatterns = [
     path('api/nombresArchivos/', nombresArchivos, name='nombresArchivos'),
     path('api/trazas/', trazas, name='trazas'),
     path('api/anomalias/', anomalias, name='anomalias'),
+    path("api/chat/", chat, name="chat")
 ]    

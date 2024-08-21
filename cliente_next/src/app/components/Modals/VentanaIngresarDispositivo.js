@@ -5,9 +5,8 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingInIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingOutIcon } from "@heroicons/react/20/solid";
 
-export default function VentanaIngresarDispositivo({ id, mostrar }) {
+export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar }) {
 
-  const [show, setShow] = useState(false);
   const [load, setLoad] = useState(false);
   const [dispositivos, setDispositivos] = useState([]);
   const [actualizarDispositivos, setActualizarDispositivos] = useState(false);
@@ -26,7 +25,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
 
   useEffect(() => {
     if (!load) {
-      setShow(mostrar);
+      setMostrar(mostrar);
       setLoad(true);
     }
 
@@ -37,14 +36,14 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
 
     window.addEventListener("keydown", (e) => {
       if(e.key === "Escape") {
-        setShow(false);
+        setMostrar(false);
       }
     })
   }, [load, dispositivos, actualizarDispositivos]);
 
   return (
     <>
-      {show ? (
+      {mostrar ? (
         <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
 
           <div
@@ -73,7 +72,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar }) {
                 type="button"
                 className="btn-close"
                 onClick={() => {
-                  setShow(false);
+                  setMostrar(false);
                 }}
               >
                 <XMarkIcon  // icono cerrar
