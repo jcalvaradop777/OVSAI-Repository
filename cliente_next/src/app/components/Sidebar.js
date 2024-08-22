@@ -72,12 +72,7 @@ export default function Sidebar({
         </div>
 
         <nav className="flex flex-col gap-1 w-full p-2 font-sans text-base font-normal text-gray-700">
-          <Link
-            href={"/"}
-            className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
-          >
-            Inicio
-          </Link>
+
           {pathname === "/volcan" ? (
             <>
               {/* Estaciones*/}
@@ -88,11 +83,10 @@ export default function Sidebar({
                 <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
                   {/* Icono gris de estación (casita) de la barra izquierda */}
                   <li
-                    className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${
-                      selected === 2
+                    className={`relative cursor-pointer select-none p-2 border-solid border-slate-400 border-[1px] rounded-xl shadow-md ${selected === 2
                         ? "border-solid border-2 border-slate-900"
                         : ""
-                    }`}
+                      }`}
                     onClick={(e) => {
                       seleccionarHerramienta(e);
                       // Mostramos el formulario para crear estación
@@ -155,6 +149,13 @@ export default function Sidebar({
           </Link>
         </div>
         */}
+
+        <Link
+          href={"/"}
+          className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+        >
+          Visualizador
+        </Link>
 
         <Link
           href={"/chat"}
