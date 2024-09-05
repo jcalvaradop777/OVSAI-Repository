@@ -1,22 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ObtenerEstaciones } from "./funciones";
 
-let estaciones = [
-  {
-    nombre_estacion: "Estación 1",
-    id_estacion: "estacion1",
-    trazas: 2,
-  },
-  {
-    nombre_estacion: "Estación 2",
-    id_estacion: "estacion2",
-    trazas: 6,
-  },
-  {
-    nombre_estacion: "Estación 3",
-    id_estacion: "estacion3",
-    trazas: 12,
-  },
-];
+let estaciones = [];
 
 function obtenerFechaHoraActual() {
   // Crea un nuevo objeto Date para obtener la fecha y hora actuales
@@ -51,10 +36,10 @@ function obtenerFechaHoraActual() {
 
   return fechaHora;
 }
-
+/* 
 function obtenerEstaciones() {
   return estaciones;
-}
+} */
 
 function crearEstacion(data) {
   const objeto = JSON.parse(data);
@@ -86,22 +71,13 @@ const parts = [
   },
   {
     text:
-      "Si te piden las estaciones o una lista muestra lo siguiente: " +
-      obtenerEstaciones().map((es) => {
-        return (
-          "ID Estación: " +
-          es.id_estacion +
-          "\n" +
-          "Nombre estación: " +
-          es.nombre_estacion +
-          "\n" +
-          "Número trazas: " +
-          es.trazas
-        );
-      }),
+      "Si te piden las estaciones o una lista responde lo siguiente: mostrar:estaciones. Además puedes usar los siguientes datos, según lo que te pregunte el usuario " +
+      estaciones,
   },
   {
-    text: "Si te piden buscar en una estación, devuelve un objeto JSON requeridamente su nombre debe ser nombre_estacion, id: id_estacion y las trazas o número de trazas: trazas. Devuelve solo el objeto json, si el usuario te da el nombre de estación o el id de estación. Caso contrario dile que requieres de más datos para buscar la estación",
+    text:
+      "Si te piden buscar una estación pide su ID o nombre y buscala en los siguientes datos: " +
+      estaciones,
   },
   {
     text: "Cuando te pregunte sobre crear una estación, debes mostrar de salida los datos en formato json: requeridamente el nombre de estación en el objeto debe ser: nombre_estacion, el id estacion: id_estacion y el número de trazas o trazas: trazas. Los campos requeridos son nombre de estación, id de estación y el número de trazas. No debes crear una estación, si el usuario no te da esos datos. Devuelve solo el objeto creado si el usuario acato las ordenes, además agrega un espacio al final y agrega: crear:estacion. En caso contrario le dirás los datos que hacen falta, pero debes comprobarlo. Si el usuario confirma que ya dio los datos, pero en el historial no están asi, debes reiterarle que debe dartelos",
@@ -117,11 +93,13 @@ const parts = [
   },
 ];
 
-export async function runOVSAIBot(answer = "Hola") {
+const historyUser = [];
+
+export async function runOVSAIBot(answer = "Hola", dataTrain = []) {
   let textoFuncion = null;
 
   if (answer.trim().length > 0) {
-    parts.push({
+    historyUser.push({
       text: "input: " + answer,
     });
   }
@@ -145,11 +123,9 @@ export async function runOVSAIBot(answer = "Hola") {
     responseMimeType: "text/plain",
   };
 
-  
-
   let result = await model
     .startChat({
-      history: [{ role: "user", parts }],
+      history: [{ role: "user", parts: [...dataTrain, ...historyUser] }],
       generationConfig: generationConfig,
     })
     .sendMessage(answer);
@@ -158,7 +134,7 @@ export async function runOVSAIBot(answer = "Hola") {
   const text = response.text();
 
   if (text) {
-    parts.push({
+    historyUser.push({
       text: "output: " + text,
     });
   }
@@ -172,6 +148,13 @@ export async function runOVSAIBot(answer = "Hola") {
       .replace(/crear:estacion/g, "");
     const estacion = crearEstacion(repla);
     textoFuncion = estacion;
+  }
+
+  if (text.toLowerCase().match(/mostrar:estaciones/)) {
+    textoFuncion = `${[
+      ...(await ObtenerEstaciones().then((res) => res.map((e) => e.nombre))),
+    ]}`;
+    estaciones = await ObtenerEstaciones();
   }
 
   return textoFuncion != null ? textoFuncion : text;

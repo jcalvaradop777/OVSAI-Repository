@@ -39,23 +39,22 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
 
     // Cargar canal y filtrar
     
-    const resultadoFiltro = Object.keys(estacionesGuralpPrueba).find((estacion) => estacion.includes(element.id));
+    /* const resultadoFiltro = Object.keys(estacionesGuralpPrueba).find((estacion) => estacion.includes(element.id));
     if(resultadoFiltro != undefined || resultadoFiltro != null) {
       handleSubfolderChange(estacionesGuralpPrueba[resultadoFiltro]);
-    }
+    } */
   };
 
   const handleSubfolderChange = (canal) => {    
-    nombresArchivos(canal);
+    nombresArchivos(`ovsp_${element.id.toLowerCase()}${canal}`);
     setdatos({ ...datos, canal: canal });
   };
 
   const handleFileNamesChange = (event) => {
     //setTrazasObox("trazas");
-    const selectedValues =
-      event.target.value != undefined
-        ? [event.target.value]
-        : event.target.selectedOptions != undefined
+    console.log(event.selectedOptions);
+    
+    const selectedValues = event.target.selectedOptions != undefined
         ? Array.from(event.target.selectedOptions).map((option) => option.value)
         : null;
     console.log(selectedValues);
@@ -195,7 +194,7 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
         </ul>
       </details>
 
-      {/* <details>
+      <details>
         <summary>
           <span>Seleccione el canal</span>
         </summary>
@@ -203,12 +202,11 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
           <li>
             <div>
               {subfolders ? (
-                <select onChange={handleSubfolderChange}>
-                  {subfolders.map((folder, index) => (
-                    <option key={index} value={folder}>
-                      {folder}
-                    </option>
-                  ))}
+                <select onChange={(e) => handleSubfolderChange(e.target.value)}>
+                    <option value={"mb"}>mb</option>
+                    <option value={"mc"}>mc</option>
+                    <option value={"md"}>md</option>
+                    <option value={"me"}>me</option>                    
                 </select>
               ) : (
                 <p>-----</p>
@@ -216,7 +214,7 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
             </div>
           </li>
         </ul>
-      </details> */}
+      </details>
 
       <details>
         <summary>
@@ -227,7 +225,7 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
             <div>
               {filesNames ? (
                 <select
-                  onClick={handleFileNamesChange}
+                  
                   onChange={handleFileNamesChange}
                   size="10"
                   multiple

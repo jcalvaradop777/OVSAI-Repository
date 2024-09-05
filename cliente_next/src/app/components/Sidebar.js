@@ -51,6 +51,8 @@ export default function Sidebar({
   const [chat, setChat] = useState(false);
   const [mensajes, setMensajes] = useState([]);
   const [mensaje, setMsg] = useState("");
+  const [Loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
 
   const handleEnviarMensaje = () => {
     const obtenerBox = document.querySelector("#mensajes-chat");
@@ -65,7 +67,7 @@ export default function Sidebar({
 
       // Hacer la pregunta
 
-      runOVSAIBot(mensaje)
+      runOVSAIBot(mensaje, data)
         .then((res) => {
           setMensajes((lastMessags) => [
             ...lastMessags,
@@ -89,6 +91,19 @@ export default function Sidebar({
     }
   };
 
+  const obtenerDatos = async () => {
+    const datos = await fetch("/api/ovsaibot/data-train/get/");
+    const respuesta = await datos.json();
+
+    if (respuesta && Array.isArray(respuesta) && respuesta.length > 0) {
+      setData([...respuesta.map((r) => {
+        return {
+          text: `${r.input}`
+        }
+      })]);
+    }
+  };
+
   useEffect(() => {
     if (_Map != null || _Map != undefined) {
       if (last != _Map.markers.length) {
@@ -98,6 +113,12 @@ export default function Sidebar({
             if (Array.isArray(res)) setLast(res.length);
           })
           .catch((err) => console.error(err));
+      }
+
+      if(Loading) {
+        obtenerDatos();
+
+        setLoading(false);
       }
     }
   }, [_Map, last]);
@@ -199,12 +220,18 @@ export default function Sidebar({
           </Link>
         </div>
         */}
-        <Link
+        {/* <Link
           href={"/snmp"}
           className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
         >
           SNMP
-        </Link>
+        </Link> */}
+        <Link
+              href={"/ovsaibothome"}
+              className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+            >
+              OVSAIBOT Home
+            </Link>
       </div>
       <button
         className="fixed w-10 h-10 left-[300px] bottom-2 z-[2000]  text-[#82A53D] hover:animate-pulse hover:w-12 hover:h-12"
@@ -215,7 +242,7 @@ export default function Sidebar({
         <ChatBubbleOvalLeftIcon width={36} height={36} />
       </button>
       {chat ? (
-        <div className="absolute w-72 h-96 p-0 left-[350px] bottom-2 box-border bg-slate-200 z-[2000]">
+        <div className="fixed w-72 h-96 p-0 left-[350px] bottom-2 box-border bg-slate-200 z-[2000]">
           <section className="relative w-full box-border p-2 bg-[#82A53D]">
             OVSAIBot
           </section>

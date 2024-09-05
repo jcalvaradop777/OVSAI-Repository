@@ -6,6 +6,7 @@ import VentanaIngresarDispositivo from "../Modals/VentanaIngresarDispositivo";
 import VentanaNscl from "../Modals/VentanaNscl";
 import VentanaAnomalias from "../Modals/VentanaAnomalias";
 import { ENV } from "@/config/env";
+import ModalBasic from "../Modals/ModalBasic";
 
 export default function MenuContext({
   Mposition, // almacena la información de la estación
@@ -24,8 +25,6 @@ export default function MenuContext({
 
   //VentanaNscl;
   // Estado de modal para editar emplazamiento/estación/sensor
-
-  
 
   const abrirAnomalias = () => {
     setAnomalias(true);
@@ -141,8 +140,6 @@ export default function MenuContext({
             Eliminar
           </li>
 
-
-
           <li
             className="cursor-pointer select-none p-2 rounded-md"
             onClick={abrirAnomalias}
@@ -183,13 +180,17 @@ export default function MenuContext({
         <></>
       )}
 
-      
-
       {mostrarAnomalias ? (
-        <VentanaAnomalias
+        <>
+        <ModalBasic mostrar={mostrarAnomalias} setMostrar={setAnomalias} contenido={
+          <h1>Hola</h1>
+        } />
+        {/* <VentanaAnomalias
           mostrarAnomalias={mostrarAnomalias}
           setAnomalias={setAnomalias}
-        />
+        /> */}
+        </>
+        
       ) : (
         <></>
       )}
