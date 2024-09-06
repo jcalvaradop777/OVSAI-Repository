@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+
+from .agenteChat import AgenteChat
 from .agenteInclinometroGuralp import openGcf, graficaOriginal, getFigurasUnaTraza, getFigVariasTrazasUnificadas, getSubfoldersNames, getFilesNames, getAnomalias
 #import agenteInclinometroGuralp as agenteIncGur
 from django.shortcuts import render
@@ -6,29 +8,34 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
 
+import spade
+from spade import wait_until_finished
+from spade.agent import Agent
+from spade.behaviour import OneShotBehaviour
+from spade.message import Message
+from spade.template import Template
+
 #rutaGcf = "D:/SGC/GCF/"
-rutaGcf = "X:/"
-rutaGcfFecha = ""
-rutaGcfFechaSubfolder = ""
-rutaGcfFechaSubfolderFile = ""
+#rutaGcf = "X:/"
+rutaGcf = "D:/Volcan-Project/gcf/"
+subfolder = ""
 
 @csrf_exempt
 def fecha2Subfolders(request):
-    global rutaGcf
-    global rutaGcfFecha
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
             #rutaGcf = "D:/SGC/GCF/" # Ruta local
-            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
+            rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]
             rutaGcfFecha = rutaGcf + anio + "/" + mes + "/"
-            subfoldersNames = getSubfoldersNames(rutaGcfFecha)
-            #print("subfolder_names: ", subfoldersNames)
-            return JsonResponse(subfoldersNames)
+            print("showRuta: ", rutaGcfFecha)
+            rutaGcf_Fecha = {'rutaGcfFecha': rutaGcfFecha}
+            return JsonResponse(rutaGcf_Fecha) #subfoldersNames
         except json.JSONDecodeError:
             pass
     else:
@@ -38,15 +45,13 @@ def fecha2Subfolders(request):
         
 @csrf_exempt
 def nombresArchivos(request):
-    global rutaGcfFecha
-    global rutaGcfFechaSubfolder
+    global subfolder
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            subfolder = data.get('selectedSubfolder')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
-            rutaGcfFechaSubfolder = rutaGcfFecha + subfolder + "/"
-            filesNames = getFilesNames(rutaGcfFechaSubfolder)
-            #print("Archivos: ", filesNames)
+            subfolder = data.get('selectedSubfolder') + "/" # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            # print("subfolder", subfolder)
+            filesNames = getFilesNames(subfolder)
             return JsonResponse(filesNames)
         except json.JSONDecodeError:
             pass
@@ -57,8 +62,7 @@ def nombresArchivos(request):
 
 @csrf_exempt
 def trazas(request):
-    global rutaGcfFechaSubfolder
-    global rutaGcfFechaSubfolderFile
+    global subfolder
     if request.method == 'POST': 
         try:
             data = json.loads(request.body)
@@ -66,11 +70,10 @@ def trazas(request):
             print("fileNamesSelected: ", fileNamesSelected)
             listaDataTrazas = []
             for fileName in fileNamesSelected:
-                rutaGcfFechaSubfolderFile = rutaGcfFechaSubfolder + fileName
-                print("rutaGcfFechaSubfolderFile ", rutaGcfFechaSubfolderFile)
-                dataTrazas = openGcf(rutaGcfFechaSubfolderFile)
+                subfolderTraza = subfolder + fileName
+                # print("subfolderTraza ", subfolder)
+                dataTrazas = openGcf(subfolderTraza)
                 listaDataTrazas.append(dataTrazas)
-            #print("dataTrazas ", dataTrazas)
             return JsonResponse(listaDataTrazas, safe=False) 
         except json.JSONDecodeError: 
             pass
@@ -88,8 +91,6 @@ def anomalias(request):
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
             
-            #rutaGcf = "D:/SGC/GCF/" # Ruta local
-            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos  
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]
@@ -174,9 +175,18 @@ def trazaAntes(request):
     
     return render(request, 'guralp.html', context)
 
-
-async def chat(request):
+def chat(request):
     # agChat = agenteChat.ReceiverAgent("ovsai@magicbroccoli.de", "87065333")
     # await agChat.start(auto_register=True)
 
-    return render(request, 'chat.html')
+    async def chatMessage():
+        senderagent = AgenteChat("rxworld@deshalbfrei.org", "Lenuxinc2024*")
+        await senderagent.start(auto_register=True)
+        await spade.wait_until_finished(senderagent)
+        #senderagent.start()
+    print("Agents finished")
+
+    
+    spade.run(chatMessage())
+
+    # return render(request, 'chat.html')

@@ -7,8 +7,10 @@ import {
 import { useEffect, useState } from "react";
 import SaveIcon from "./SaveIcon";
 import { ENV } from "@/config/env";
+import VentanaGuralp from "../Modals/VentanaGuralp";
 
-export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el identificador de la estación
+export default function CrudNscl({ nscls, setNscls, id, element }) {
+  // el id es el identificador de la estación
 
   const [busqueda, setBusqueda] = useState("");
   const [load, setLoad] = useState(false);
@@ -20,7 +22,8 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   const [instrumentos, setInstrumentos] = useState("");
 
-  const [datos, setDatos] = useState({  // de un solo registro en cuestión
+  const [datos, setDatos] = useState({
+    // de un solo registro en cuestión
     id_nscl: "",
     codigo_localizacion: "",
     instrumento: "",
@@ -86,13 +89,13 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
       tipo_adquisicion: nscl.tipo_adquisicion,
       estado: nscl.estado,
       comentarios: nscl.comentarios,
-      estacion: nscl.estacion
-    })
+      estacion: nscl.estacion,
+    });
   };
 
   //Función para llamar a los distintos tipos de instrumentos de la tabla de dispositivos de la base de datos
   const obtenerInstrumentos = async () => {
-    const response = await fetch("/api/dispositivos/getsubgrupos/" + id);  // el id es el identificador de la estación
+    const response = await fetch("/api/dispositivos/getsubgrupos/" + id); // el id es el identificador de la estación
     await response
       .json()
       .then((res) => {
@@ -104,7 +107,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   // Función para llamar a los Nscls de la base de datos
   const obtenerNscls = async () => {
-    const response = await fetch("/api/nscl/get/" + id);  // el id es el identificador de la estación
+    const response = await fetch("/api/nscl/get/" + id); // el id es el identificador de la estación
     await response
       .json()
       .then((res) => {
@@ -116,9 +119,9 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   // Nueva Fila
   const handleNuevaFila = () => {
-    setNuevaFila((prev) => prev = true);    
+    setNuevaFila((prev) => (prev = true));
     console.log(nuevaFila);
-  }
+  };
 
   const resetearDatos = () => {
     setDatos({
@@ -139,9 +142,9 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
       tipo_adquisicion: "",
       estado: "",
       comentarios: "",
-      estacion: id // llave foranea que conecta al dispositivo con la estación
+      estacion: id, // llave foranea que conecta al dispositivo con la estación
     });
-  }
+  };
 
   // Función para eliminar dispostivos de la base de datos
   const handleEliminar = (nscl) => {
@@ -149,18 +152,16 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
       `¿Estás seguro que deseas eliminar el nscl ${nscl.id_nscl}?`
     );
     if (confirm) {
-      const response = fetch(ENV.URLBASE + "/api/nscl/delete",
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id_nscl: nscl.id_nscl,
-          }),
-        }
-      );
+      const response = fetch(ENV.URLBASE + "/api/nscl/delete", {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_nscl: nscl.id_nscl,
+        }),
+      });
 
       response
         .then((res) => {
@@ -197,17 +198,19 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
         tipo_adquisicion: datos.tipo_adquisicion,
         estado: datos.estado,
         comentarios: datos.comentarios,
-        estacion: datos.estacion
+        estacion: datos.estacion,
       }),
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-    }).then(async (res) => {
-      console.log(await res.json());
-    }).catch((err) => {
-      console.error(err);
-    });
+    })
+      .then(async (res) => {
+        console.log(await res.json());
+      })
+      .catch((err) => {
+        console.error(err);
+      });
 
     obtenerNscls();
     resetearDatos();
@@ -220,14 +223,11 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   // Función para crear nuevo NSCL en la Base de datos
   const handleNuevoNscl = () => {
-
     // Comprobamos que hay datos para insertar
     const comprobar = comprobarDatosGuardar();
     if (comprobar) {
-
       const comprobarDatosNoVacios = comprobarCamposVacios();
       if (comprobarDatosNoVacios) {
-
         const guadar = confirm("¿Deseas guardar los datos?");
         if (guadar) {
           // Crear NSCL en la BD
@@ -251,7 +251,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
               tipo_adquisicion: datos.tipo_adquisicion,
               estado: datos.estado,
               comentarios: datos.comentarios,
-              estacion: datos.estacion
+              estacion: datos.estacion,
             }),
             headers: {
               Accept: "application/json",
@@ -271,16 +271,17 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
           setNuevaFila(false);
           resetearDatos();
-
-        } else { // Pregunta Guardar Datos
+        } else {
+          // Pregunta Guardar Datos
           setNuevaFila(false);
           LimpiarCampos();
         }
-
-      } else { // --- Datos no vacios
-        alert("Los campos: Instrumento, Sensor y Digitalizador, son requeridos.");
+      } else {
+        // --- Datos no vacios
+        alert(
+          "Los campos: Instrumento, Sensor y Digitalizador, son requeridos."
+        );
       }
-
     } else {
       setNuevaFila(!nuevaFila);
     }
@@ -302,13 +303,18 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
   // Función para comprobar si hay campos vacios
   function comprobarCamposVacios() {
     let comprobar = false;
-    
-  //  NO ESTA GUARDANDO ES COMO SI NO LLEGARA NADA A datos
-  //  HAY QUE HACER EL DELETE TAMBIÉN
 
-    console.log("datos instrumentooooooo", datos.instrumento)
+    //  NO ESTA GUARDANDO ES COMO SI NO LLEGARA NADA A datos
+    //  HAY QUE HACER EL DELETE TAMBIÉN
 
-    if (datos.instrumento != "" && datos.sensor != "" && datos.digitalizador != "" && datos.transmision != "") {
+    console.log("datos instrumentooooooo", datos.instrumento);
+
+    if (
+      datos.instrumento != "" &&
+      datos.sensor != "" &&
+      datos.digitalizador != "" &&
+      datos.transmision != ""
+    ) {
       comprobar = true;
     }
     return comprobar;
@@ -332,7 +338,7 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
   useEffect(() => {
     obtenerInstrumentos();
-  }, [])
+  }, []);
 
   useEffect(() => {
     console.log(nscls);
@@ -346,6 +352,12 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
       setFiltro([...nscls.filter((q) => q !== busqueda)]);
     }
   }, [busqueda, load, nscls]);
+
+  const [mostrarVentana, setVentana] = useState(false);
+
+  const handleAbrirTrazas = () => {
+    setVentana(true);
+  };
 
   return (
     <>
@@ -374,38 +386,38 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
         />
       </div>
 
-
-      {/* Tabla */}      
-        <table>
-          <thead>
-            <tr>
-              {" "}
-              {/* Cabeceras */}
-              <th>Editar/Guardar</th>
-              <th>Eliminar</th>
-              {/* <th>ID</th> */}
-              <th>Código de localización</th>
-              <th>Instrumento</th>
-              {/* <th>Fecha de inicio</th>
+      {/* Tabla */}
+      <table>
+        <thead>
+          <tr>
+            {" "}
+            {/* Cabeceras */}
+            <th>Editar/Guardar</th>
+            <th>Eliminar</th>
+            {/* <th>ID</th> */}
+            <th>Código de localización</th>
+            <th>Instrumento</th>
+            {/* <th>Fecha de inicio</th>
               <th>Fecha de finalización</th> */}
-              <th>Sensor</th>
-              <th>Digitalizador</th>
-              <th>Transmisión</th>
-              {/* <th>Almacenamiento</th>
+            <th>Sensor</th>
+            <th>Digitalizador</th>
+            <th>Transmisión</th>
+            {/* <th>Almacenamiento</th>
               <th>Condición de instalación</th>
               <th>Transmisión</th>
               <th>Descarga</th>
               <th>Alcance</th>
               <th>Tipo de estación</th>
               <th>Tipo de adquisición</th> */}
-              <th>Estado</th>
-              <th>Comentarios</th>
-              {/* <th>Estación</th> */}
-            </tr>
-          </thead>
+            <th>Estado</th>
+            <th>Comentarios</th>
+            {/* <th>Estación</th> */}
+          </tr>
+        </thead>
 
-          <tbody>
-          {nscls != null && nscls.length > 0 ? ( filtro.map((nscl, i) => (
+        <tbody>
+          {nscls != null && nscls.length > 0 ? (
+            filtro.map((nscl, i) => (
               <tr key={"nscl-" + i}>
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
@@ -430,10 +442,11 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                 {/* boton eliminar */}
                 <td>
                   <button
-                    className={`btn-remove ${editando.estado && editando.id === nscl.id_nscl
-                      ? "btn-disabled"
-                      : ""
-                      }`}
+                    className={`btn-remove ${
+                      editando.estado && editando.id === nscl.id_nscl
+                        ? "btn-disabled"
+                        : ""
+                    }`}
                     onClick={() => handleEliminar(nscl)}
                   >
                     <TrashIcon className="w-5 h-5" />
@@ -458,20 +471,19 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
 
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
-
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="instrumento"
-                      value={(datos != null) ? datos.instrumento : ""}
+                      value={datos != null ? datos.instrumento : ""}
                       onChange={handleHacerCambios}
                     >
                       {/* options */}
                       {instrumentos.map((inst, index) => (
-                        <option key={index} value={inst.subgrupo}>{inst.subgrupo}</option>
+                        <option key={index} value={inst.subgrupo}>
+                          {inst.subgrupo}
+                        </option>
                       ))}
-
                     </select>
-
                   ) : (
                     <>{nscl.instrumento}</>
                   )}
@@ -524,10 +536,12 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="estado"
-                      value={(datos != null) ? datos.estado : ""}
+                      value={datos != null ? datos.estado : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="Activa">Activa</option>
                       <option value="Inactiva">Inactiva</option>
                     </select>
@@ -539,7 +553,9 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                 <td>
                   {editando.estado && editando.id === nscl.id_nscl ? (
                     <textarea
-                      name="comentarios" rows="4" cols="40"
+                      name="comentarios"
+                      rows="4"
+                      cols="40"
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
                       value={datos.comentarios}
@@ -549,112 +565,129 @@ export default function CrudNscl({ nscls, setNscls, id }) {  // el id es el iden
                     <>{nscl.comentarios}</>
                   )}
                 </td>
-
               </tr>
+            ))
+          ) : (
+            <></>
+          )}
 
-            ))) : (<></>)} 
+          {/* para nuevo NSCL */}
+          {nuevaFila ? (
+            <>
+              <tr>
+                <td>
+                  <button
+                    className="btn-save"
+                    onClick={handleNuevoNscl}
+                    title="Editar/Guardar"
+                  >
+                    <SaveIcon className="w-5 h-5 text-white" />
+                  </button>
+                </td>
 
-            {/* para nuevo NSCL */}
-            {nuevaFila ? (
-              <>
-                <tr>
+                <td> </td>
 
-                  <td>
-                    <button
-                      className="btn-save"
-                      onClick={handleNuevoNscl}
-                      title="Editar/Guardar"
-                    >
-                      <SaveIcon className="w-5 h-5 text-white" />
-                    </button>
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="codigo_localizacion"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    {" "}
-                  </td>
+                <td>
+                  <select
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="instrumento"
+                    onChange={handleHacerCambios}
+                  >
+                    {/* options */}
+                    {instrumentos.map((inst, index) => (
+                      <option key={index} value={inst.subgrupo}>
+                        {inst.subgrupo}
+                      </option>
+                    ))}
+                  </select>
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="codigo_localizacion"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="sensor"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="instrumento"
-                      onChange={handleHacerCambios}
-                    >
-                      {/* options */}
-                      {instrumentos.map((inst, index) => (
-                        <option key={index} value={inst.subgrupo}>{inst.subgrupo}</option>
-                      ))}
-                    </select>
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="digitalizador"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="sensor"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="transmision"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="digitalizador"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <select
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="estado"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="Activa">Activa</option>
+                    <option value="Inactiva">Inactiva</option>
+                  </select>
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="transmision"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="estado"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="Activa">Activa</option>
-                      <option value="Inactiva">Inactiva</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <textarea
-                      name="comentarios" rows="4" cols="40"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                </tr>
-              </>
-            ) : (
-              <></>
-            )}
-          </tbody>
-        </table>
+                <td>
+                  <textarea
+                    name="comentarios"
+                    rows="4"
+                    cols="40"
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
+              </tr>
+            </>
+          ) : (
+            <></>
+          )}
+        </tbody>
+      </table>
 
       <button className="btn-create" onClick={handleNuevaFila}>
         Crear NSCL
       </button>
 
+      <button className="btn-create" onClick={handleAbrirTrazas}>
+        Trazas
+      </button>
+      {mostrarVentana ? (
+        <VentanaGuralp
+          mostrarVentana={mostrarVentana}
+          setVentana={setVentana}
+          element={element}
+          id={id}
+        />
+      ) : (
+        <></>
+      )}
+      
     </>
   );
 }

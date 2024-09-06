@@ -8,7 +8,7 @@ import VentanaAnomalias from "../Modals/VentanaAnomalias";
 import { ENV } from "@/config/env";
 
 export default function MenuContext({
-  Mposition,  // almacena la información de la estación
+  Mposition, // almacena la información de la estación
   setMPosition,
   Modal,
   setModal,
@@ -17,25 +17,24 @@ export default function MenuContext({
   setSelected,
   setShow,
 }) {
-
-  const [mostrarVentana, setVentana] = useState(false);
   const [mostrarAnomalias, setAnomalias] = useState(false);
   const [mostrarEdicion, setEdicion] = useState(false);
   const [showDispositivos, setMostrarDispositivos] = useState(false);
   const [showNscls, setMostrarNscls] = useState(false);
 
-  VentanaNscl
+  //VentanaNscl;
   // Estado de modal para editar emplazamiento/estación/sensor
 
-  const abrirTrazas = () => {
-    setVentana(true);
-  };
+  
 
   const abrirAnomalias = () => {
     setAnomalias(true);
+    hideMenuContext();
   };
 
   const crearEstacion = () => {
+    hideMenuContext();
+
     // Le asignamos un valor de 4 a la herramienta, para que no tenga conflictos
     // Pero sigue siendo una estación
     setSelected((value) => (value = 4));
@@ -58,9 +57,12 @@ export default function MenuContext({
 
   const handleEditar = () => {
     setEdicion(true);
+    hideMenuContext();
   };
 
   const handleEliminar = async () => {
+    hideMenuContext();
+
     if (Mposition.element != null) {
       const confirm = window.confirm(
         `¿Estás seguro que deseas eliminar el elemento ${Mposition.element.nombre}?`
@@ -76,8 +78,7 @@ export default function MenuContext({
             id: Mposition.element.id,
             //type: Mposition.element.type,
           }),
-        }
-        );
+        });
 
         if (response.ok) {
           _setMap({
@@ -90,9 +91,8 @@ export default function MenuContext({
             x: 0,
             y: 0,
             visible: false,
-            element: null
+            element: null,
           });
-
         }
       }
     }
@@ -100,85 +100,90 @@ export default function MenuContext({
 
   const verDispositivos = () => {
     setMostrarDispositivos(true);
+    hideMenuContext();
   };
 
   const verNscl = () => {
     setMostrarNscls(true);
+    hideMenuContext();
+  };
+
+  // Desactivar el menú contextual después de 500 ms
+  const hideMenuContext = () => {
+    setTimeout(() => {
+      setMPosition({
+        ...Mposition,
+        x: 0,
+        y: 0,
+        visible: false,
+      });
+    }, 500);
   };
 
   return (
     <>
-      <ul
-        style={{ left: `${Mposition.x}px`, top: `${Mposition.y}px` }}
-        className={`absolute bg-white p-1 box-content border border-slate-700 shadow-lg list-none w-max rounded-xl z-50 text-sm`}
-      >
-        <li
-          className="cursor-pointer select-none p-2 rounded-md"
-          onClick={handleEditar}
+      {Mposition.visible ? (
+        <ul
+          style={{ left: `${Mposition.x}px`, top: `${Mposition.y}px` }}
+          className={`absolute bg-white p-1 box-content border border-slate-700 shadow-lg list-none w-max rounded-xl z-50 text-sm`}
         >
-          Datos
-        </li>
+          <li
+            className="cursor-pointer select-none p-2 rounded-md"
+            onClick={handleEditar}
+          >
+            Datos
+          </li>
 
-        <li
-          className="cursor-pointer select-none p-2 rounded-md"
-          onClick={handleEliminar}
-        >
-          Eliminar
-        </li>
+          <li
+            className="cursor-pointer select-none p-2 rounded-md"
+            onClick={handleEliminar}
+          >
+            Eliminar
+          </li>
 
-        <li
-          className="cursor-pointer select-none p-2 rounded-md"
-          onClick={abrirTrazas}
-        >
-          Trazas
-        </li>
 
-        <li
-          className="cursor-pointer select-none p-2 rounded-md"
-          onClick={abrirAnomalias}
-        >
-          Anomalías
-        </li>
 
-        <li
-          className="cursor-pointer select-none p-2 rounded-md"
-          onClick={verDispositivos}
-        >
-          Dispositivos
-        </li>
+          <li
+            className="cursor-pointer select-none p-2 rounded-md"
+            onClick={abrirAnomalias}
+          >
+            Anomalías
+          </li>
 
-        <li
-          className="cursor-pointer select-none p-2 rounded-md"
-          onClick={verNscl}
-        >
-          Nscl
-        </li>
+          <li
+            className="cursor-pointer select-none p-2 rounded-md"
+            onClick={verDispositivos}
+          >
+            Dispositivos
+          </li>
 
-        {Mposition.element != null ? (
-          Mposition.element.type === 1 ? (
-            <li
-              className="cursor-pointer select-none p-2 rounded-md"
-              onClick={crearEstacion}
-            >
-              Agregar estación
-            </li>
+          <li
+            className="cursor-pointer select-none p-2 rounded-md"
+            onClick={verNscl}
+          >
+            Nscl
+          </li>
+
+          {Mposition.element != null ? (
+            Mposition.element.type === 1 ? (
+              <li
+                className="cursor-pointer select-none p-2 rounded-md"
+                onClick={crearEstacion}
+              >
+                Agregar estación
+              </li>
+            ) : (
+              <></>
+            )
           ) : (
             <></>
-          )
-        ) : (
-          <></>
-        )}
-
-      </ul>
-
-      {mostrarVentana ? (
-        <VentanaGuralp
-          mostrarVentana={mostrarVentana}
-          setVentana={setVentana}
-        />
+          )}
+        </ul>
       ) : (
         <></>
       )}
+
+      
 
       {mostrarAnomalias ? (
         <VentanaAnomalias
@@ -189,7 +194,7 @@ export default function MenuContext({
         <></>
       )}
 
-      {mostrarEdicion ? (
+      {mostrarEdicion && Mposition.element != null ? (
         <VentanaEditarEstacion
           mostrar={mostrarEdicion}
           setMostrar={setEdicion}
@@ -199,24 +204,26 @@ export default function MenuContext({
         <></>
       )}
 
-      {showDispositivos ? (
+      {showDispositivos && Mposition.element != null ? (
         <VentanaIngresarDispositivo
           mostrar={showDispositivos}
+          setMostrar={setMostrarDispositivos}
           id={Mposition.element.id} // el id es el identificador de la estación
         />
       ) : (
         <></>
       )}
 
-      {showNscls ? (
+      {showNscls && Mposition.element != null ? (
         <VentanaNscl
           mostrar={showNscls}
+          setMostrar={setMostrarNscls}
           id={Mposition.element.id} // el id es el identificador de la estación
+          element={Mposition.element}
         />
       ) : (
         <></>
       )}
-
     </>
   );
 }

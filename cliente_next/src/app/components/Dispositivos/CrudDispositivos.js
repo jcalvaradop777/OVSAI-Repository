@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import SaveIcon from "./SaveIcon";
 import { ENV } from "@/config/env";
+import DashboardSnmp from "../Snmp/DashboardSnmp";
 
 export default function CrudDispositivos({ dispositivos, setDispositivos, id }) {  // el id es el identificador de la estación
 
@@ -55,6 +56,10 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
       ]);
     }
   };
+
+  const [mostrarVentanaSnmp, setVentanaSnmp] = useState(false);
+  const [serialSnmp, setSerialSnmp] = useState(null);;
+
 
   // Función para hacer cambios, mientras se edita
   const handleHacerCambios = (e) => {
@@ -163,14 +168,14 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
       );
 
       response
-      .then((res) => {
-        console.log(res);
-        obtenerDispositivos();
-        alert("Dispositivo eliminado");
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((res) => {
+          console.log(res);
+          obtenerDispositivos();
+          alert("Dispositivo eliminado");
+        })
+        .catch((err) => {
+          console.error(err);
+        });
       resetearDatos();
     }
   };
@@ -221,12 +226,6 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
 
   // Función para crear nuevo dispositivo en la Base de datos
   const handleNuevoDispositivo = () => {
-
-    // HAY QUE RECARGAR EL MAPA DESPUÉS DE ELIMINAR UNA ESTACIÓN (PREGUNTAR A SANTIAGO)
-    // AL ELIMINAR EL DISPOSITIVO NO SE ACTUALIZA LA TABLA PREGUNTAR A SANTIAGO
-    // CUANDO SE ACTUALIZA, AVECES SE REFRESCA LA TABLA AVECES NO  (SANTIAGO)
-    // HAT QE CAMBIAR LOS CONTROLES EN EL EDITAR
-    // HAY QUE HACER LISTAS CON LAS SELECCIONES ADECUADAS
 
     // Comprobamos que hay datos para insertar
     const comprobar = comprobarDatosGuardar();
@@ -335,6 +334,14 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
     return comprobar;
   }
 
+
+  // Función para eliminar dispostivos de la base de datos
+  const handleSnmp = (ser) => {
+    setVentanaSnmp(true)
+    setSerialSnmp(ser)
+  };
+
+
   useEffect(() => {
     console.log(dispositivos);
 
@@ -383,8 +390,9 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
             <tr>
               {" "}
               {/* Cabeceras */}
-              <th>Editar/Guardar</th>
+              <th>Editar/ Guardar</th>
               <th>Eliminar</th>
+              <th>Metadato (SNMP)</th>
               {/* <th>ID</th> */}
               <th>Grupo</th>
               <th>Subgrupo</th>
@@ -444,6 +452,24 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
+                </td>
+
+                {/* SNMP */}
+                <td>
+                  <button
+                    className={`btn-normal`}
+                    onClick={() => handleSnmp(dispositivo.serial)}
+                  >
+                    <TvIcon className="w-5 h-5" />
+                  </button>
+                  {mostrarVentanaSnmp ? (
+                    <DashboardSnmp
+                      setVentana={setVentanaSnmp}
+                      id_serial={serialSnmp}
+                    />
+                  ) : (
+                    <></>
+                  )}
                 </td>
 
                 {/* Registros */}
@@ -1095,7 +1121,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                   </td>
 
                   <td>
-                  <select
+                    <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="propietario"
                       onChange={handleHacerCambios}
@@ -1107,7 +1133,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                   </td>
 
                   <td>
-                  <select
+                    <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="proveedor"
                       onChange={handleHacerCambios}
@@ -1127,7 +1153,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                   </td>
 
                   <td>
-                  <select
+                    <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="responsable"
                       onChange={handleHacerCambios}
@@ -1138,7 +1164,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                   </td>
 
                   <td>
-                  <select
+                    <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="lugar"
                       onChange={handleHacerCambios}
@@ -1205,7 +1231,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                   </td>
 
                   <td>
-                  <select
+                    <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="inventariado"
                       onChange={handleHacerCambios}

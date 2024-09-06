@@ -5,9 +5,9 @@
 import TrazaAgrupada from '../components/TimeSeries/TrazaAgrupada';
 import BoxPlot from '../components/TimeSeries/BoxPlot';
 import SidebarTrazas from '../components/TimeSeries/SidebarTrazas';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-export default function RenderTrazaGuralp() {
+export default function RenderTrazaGuralp({element, id}) {
 
   const [trazasRecibidas, setTrzasRecibidas] = useState("");
   const [trazasObox, setTrazasObox] = useState("");
@@ -19,7 +19,7 @@ export default function RenderTrazaGuralp() {
 
   return (
     <div className="flex">
-      <SidebarTrazas onEnviarDatos={handleRecibirDatos} /> {/*esto es el lado izquierdo que obtiene los subfolders y los respectivos nombres de archivos */}
+      <SidebarTrazas onEnviarDatos={handleRecibirDatos} element={element} id={id} /> {/*esto es el lado izquierdo que obtiene los subfolders y los respectivos nombres de archivos */}
       <div className="flex-1">
         <div className="p-1">
           {/* <Traza dx={trazasRecibidas.idx} dy={trazasRecibidas.valores} dtitulo={"Traza individual: " + trazasRecibidas.titulo} />
