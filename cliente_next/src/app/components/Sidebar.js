@@ -15,6 +15,7 @@ import FiltrosEstaciones from "./Estaciones/FiltrosEstaciones";
 import { ENV } from "@/config/env";
 import { useEffect, useState } from "react";
 import { runOVSAIBot } from "@/OVSAIBot";
+import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 export default function Sidebar({
   Modal,
   setModal,
@@ -53,6 +54,7 @@ export default function Sidebar({
   const [mensaje, setMsg] = useState("");
   const [Loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [chatFullScreen, setChatFullScreen] = useState(false); 
 
   const handleEnviarMensaje = () => {
     const obtenerBox = document.querySelector("#mensajes-chat");
@@ -96,11 +98,13 @@ export default function Sidebar({
     const respuesta = await datos.json();
 
     if (respuesta && Array.isArray(respuesta) && respuesta.length > 0) {
-      setData([...respuesta.map((r) => {
-        return {
-          text: `${r.input}`
-        }
-      })]);
+      setData([
+        ...respuesta.map((r) => {
+          return {
+            text: `${r.input}`,
+          };
+        }),
+      ]);
     }
   };
 
@@ -115,13 +119,14 @@ export default function Sidebar({
           .catch((err) => console.error(err));
       }
 
-      if(Loading) {
+      if (Loading) {
         obtenerDatos();
+        
 
         setLoading(false);
       }
     }
-  }, [_Map, last]);
+  }, [_Map, last]);  
 
   return (
     <>
@@ -227,11 +232,11 @@ export default function Sidebar({
           SNMP
         </Link> */}
         <Link
-              href={"/ovsaibothome"}
-              className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
-            >
-              OVSAIBOT Home
-            </Link>
+          href={"/ovsaibothome"}
+          className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+        >
+          OVSAIBOT Home
+        </Link>
       </div>
       <button
         className="fixed w-10 h-10 left-[300px] bottom-2 z-[2000]  text-[#82A53D] hover:animate-pulse hover:w-12 hover:h-12"
@@ -242,9 +247,21 @@ export default function Sidebar({
         <ChatBubbleOvalLeftIcon width={36} height={36} />
       </button>
       {chat ? (
-        <div className="fixed w-72 h-96 p-0 left-[350px] bottom-2 box-border bg-slate-200 z-[2000]">
-          <section className="relative w-full box-border p-2 bg-[#82A53D]">
-            OVSAIBot
+        <div
+          className={`fixed ${
+            chatFullScreen ? "w-full h-full" : "w-72 h-96 left-[350px]"
+          } p- bottom-2 box-border bg-slate-200 z-[2000]`}
+        >
+          <section className="relative w-full box-border p-2 bg-[#82A53D] flex flex-row gap-1-">
+            <span className="align-middle justify-center">OVSAIBot</span>
+            <button
+              onClick={() => {
+                setChatFullScreen(!chatFullScreen);
+              }}
+              className="cursor-pointer select-none p-2 rounded-md absolute right-0 top-0"
+            >
+              <EnterFullScreenIcon width={30} height={30} />
+            </button>
           </section>
           <section
             id="mensajes-chat"

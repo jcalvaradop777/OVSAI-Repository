@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ObtenerEstaciones } from "./funciones";
+import pdfToText from "react-pdftotext";
 
 let estaciones = [];
 
@@ -56,6 +57,25 @@ function crearEstacion(data) {
 
 const genAI = new GoogleGenerativeAI("AIzaSyBysod8t2m9m_S-nFjUKhTS6hQpg89M51g");
 
+const historyUser = [];
+let textoPdf = "";
+
+// Leer documento pdf, función
+
+const readDocumentRemote = async (pdf_url) => {
+  const file = await fetch(pdf_url)
+    .then((res) => res.blob())
+    .catch((error) => console.error(error));
+
+  pdfToText(file)
+    .then((text) => textoPdf = text)
+    .catch((error) => console.error("Failed to extract text from pdf"));
+};
+
+// ---
+
+
+
 const parts = [
   { text: "Tu eres OVSAIBot, tu asistente en OVSAI" },
   {
@@ -93,9 +113,36 @@ const parts = [
   },
 ];
 
-const historyUser = [];
+const activarPdf = () => {
+  console.log("Pdf activado");
+  
+  historyUser.push({
+    text: `input: ${textoPdf}`
+  })
+}
+
+const ordenesPDF = [
+  {
+    text:
+      "Si te preguntan sobre activar preguntas a boletin, devuelve lo siguiente: activa:boletin:pdf",
+  },
+];
 
 export async function runOVSAIBot(answer = "Hola", dataTrain = []) {
+  if (textoPdf.trim().length == 0) {
+    readDocumentRemote("boletines/Boletin_volcanes_sur_jun_2024.pdf")
+      .then((res) => {
+        //textoPdf = res;
+        console.log(res);
+        
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } 
+
+
+
   let textoFuncion = null;
 
   if (answer.trim().length > 0) {
@@ -109,7 +156,7 @@ export async function runOVSAIBot(answer = "Hola", dataTrain = []) {
     systemInstruction: {
       parts: [
         {
-          text: "Eres un asistente virtual experto en OVSAI. Puedes proporcionar información sobre estaciones, sensores y responder preguntas relacionadas con OVSAI. Tus respuestas deben ser concisas y fáciles de entender.",
+          text: "Eres un asistente virtual experto en OVSAI. Puedes proporcionar información sobre estaciones, sensores y responder preguntas relacionadas con OVSAI. Tus respuestas deben ser concisas y fáciles de entender. También puedes leer pdf si te lo piden",
         },
       ],
     },
@@ -125,10 +172,12 @@ export async function runOVSAIBot(answer = "Hola", dataTrain = []) {
 
   let result = await model
     .startChat({
-      history: [{ role: "user", parts: [...dataTrain, ...historyUser] }],
+      history: [{ role: "user", parts: [...ordenesPDF, ...historyUser] }],
       generationConfig: generationConfig,
     })
     .sendMessage(answer);
+
+    // ...dataTrain
 
   const response = result.response;
   const text = response.text();
@@ -155,6 +204,10 @@ export async function runOVSAIBot(answer = "Hola", dataTrain = []) {
       ...(await ObtenerEstaciones().then((res) => res.map((e) => e.nombre))),
     ]}`;
     estaciones = await ObtenerEstaciones();
+  }
+
+  if(text.toLowerCase().match(/activa:boletin:pdf/)) {
+    activarPdf();
   }
 
   return textoFuncion != null ? textoFuncion : text;
