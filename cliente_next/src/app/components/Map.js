@@ -6,6 +6,10 @@ import { ENV } from "@/config/env";
 import "@maptiler/sdk/dist/maptiler-sdk.css";
 import IngresarEstacion from "./Estaciones/FrmIngresarEstacion";
 import MenuContext from "./Estaciones/MenuCtx";
+import Image from "next/image";
+import { Tooltip } from "@nextui-org/react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { TemperatureLayer, WindLayer } from "@maptiler/weather";
 
 export default function Map({
   Modal,
@@ -28,6 +32,46 @@ export default function Map({
   });
 
   const [zoom] = useState(14);
+  const [showCapas, setShowCapas] = useState(false);
+  const [capas] = useState([
+    { style: "Básico", src: "/layers-map/basic-style.jpeg", setStyle: "basic" },
+    {
+      style: "Híbrido",
+      src: "/layers-map/hybrid-style.jpeg",
+      setStyle: "hybrid",
+    },
+    {
+      style: "Outdoor",
+      src: "/layers-map/outdoor-style.jpeg",
+      setStyle: "outdoor",
+    },
+    {
+      style: "Satélite",
+      src: "/layers-map/satellite-style.jpeg",
+      setStyle: "satellite",
+    },
+    {
+      style: "Calles",
+      src: "/layers-map/streets-style.jpeg",
+      setStyle: "streets",
+    },
+    {
+      style: "Invierno/Winter",
+      src: "/layers-map/winter-style.jpeg",
+      setStyle: "winter",
+    },
+    {
+      style: "Temperatura",
+      src: "/layers-map/temperature-style.PNG",
+      setStyle: "temperature",
+    },
+    {
+      style: "Clima",
+      src: "/layers-map/weather-style.PNG",
+      setStyle: "weather",
+    },
+  ]);
+  const [mapStyle, setMapStyle] = useState("hybrid");
 
   maptilersdk.config.apiKey = ENV.API_KEY;
 
@@ -182,15 +226,15 @@ export default function Map({
         });
 
         //if (selected !== 0) {
-          _setMap({
-            ..._Map,
-            _data: {
-              lat: e.lngLat.lat,
-              long: e.lngLat.lng,
-            },
-          });
+        _setMap({
+          ..._Map,
+          _data: {
+            lat: e.lngLat.lat,
+            long: e.lngLat.lng,
+          },
+        });
 
-          openModal();
+        openModal();
         //}
 
         if (selected === 0) {
@@ -204,7 +248,7 @@ export default function Map({
     // Aqui se ponen los controles de la derecha en el mapa
     map.current = new maptilersdk.Map({
       container: mapContainer.current,
-      style: "hybrid",
+      style: mapStyle === "temperature" || mapStyle === "weather" ? "backdrop" : mapStyle,
       center: [ovspa.lng, ovspa.lat],
       zoom: zoom,
       hash: true,
@@ -214,6 +258,29 @@ export default function Map({
       geolocateControl: true,
       navigationControl: true,
     });
+
+    if (mapStyle === "temperature") {
+      map.current.on("load", () => {
+        const temperatureLayer = new TemperatureLayer();
+
+        map.current.setPaintProperty(
+          "Water",
+          "fill-color",
+          "rgba(0, 0, 0, 0.4)"
+        );
+        map.current.addLayer(temperatureLayer, "Water");
+      });
+      //weatherLayer.animateByFactor(3600);
+    }
+
+    if(mapStyle === "weather") {
+      const weatherLayer = new WindLayer();
+
+      map.current.on('load', function () {
+        map.current.setPaintProperty("Water", 'fill-color', "rgba(0, 0, 0, 0.4)");
+        map.current.addLayer(weatherLayer, 'Water');
+      });
+    }
   }, [ovspa.lng, ovspa.lat, zoom, show, _Map, selected]);
 
   const openModal = () => {
@@ -233,6 +300,134 @@ export default function Map({
         setShow={setShow}
       />
       <div ref={mapContainer} className={`w-full h-screen relative`} />
+      <Tooltip className="text-[16px]" placement="right" content="Capas">
+        <button
+          onClick={() => {
+            setShowCapas(!showCapas);
+          }}
+          className="z-[500] p-0 rounded-lg bg-white left-[300px] bottom-14 fixed cursor-pointer select-none"
+        >
+          <Image
+            src={"/layers-map/satellite-style.jpeg"}
+            width={60}
+            className="rounded-lg"
+            height={60}
+            alt="Satellite image"
+          />
+        </button>
+      </Tooltip>
+      {showCapas ? (
+        <ul
+          id="capas-box"
+          className="left-[365px] list-none p-2 rounded-lg bottom-14 fixed w-64 h-20 overflow-x-hidden flex flex-row gap-2 overflow-y-hidden bg-white"
+        >
+          {capas.map((capa) => {
+            return (
+              <Tooltip placement="top" content={capa.style}>
+                <Image
+                  onClick={() => {
+                    setMapStyle(capa.setStyle);
+
+                    map.current = null;
+                    _setMap({
+                      ..._Map,
+                      reload: true,
+                    });
+                  }}
+                  src={capa.src}
+                  width={160}
+                  height={120}
+                  className="rounded-lg cursor-pointer select-none"
+                  alt={capa.style}
+                />
+              </Tooltip>
+            );
+          })}
+          <Tooltip placement="top" content="Siguiente">
+            <ChevronRightIcon
+              onClick={() => {
+                const scrollCapas = document.querySelector("#capas-box");
+                const scrollPos = scrollCapas.scrollLeft;
+
+                const scrollTotal = scrollCapas.scrollWidth;
+                const scrollInteract =
+                  scrollCapas.scrollLeft + scrollCapas.clientWidth;
+
+                console.log(scrollTotal);
+                console.log(scrollInteract);
+
+                if (scrollTotal >= scrollInteract) {
+                  scrollCapas.scrollTo({
+                    left: scrollPos + 10,
+                    behavior: "smooth",
+                  });
+                }
+              }}
+              onMouseDown={(e) => {
+                if (e.button == 0) {
+                  /* setInterval(() => {
+                    console.log(e);
+                  }, 500); */
+                  /*
+                    setInterval(() => {
+                    const scrollCapas = document.querySelector("#capas-box");
+                    const scrollPos = scrollCapas.scrollLeft;
+
+                    const scrollTotal = scrollCapas.scrollWidth;
+                    const scrollInteract =
+                      scrollCapas.scrollLeft + scrollCapas.clientWidth;
+
+                    console.log(scrollTotal);
+                    console.log(scrollInteract);
+
+                    if (scrollTotal >= scrollInteract) {
+                      scrollCapas.scrollTo({
+                        left: scrollPos + 10,
+                        behavior: "smooth",
+                      });
+                    }
+                  }, 500);
+                  */
+                }
+              }}
+              onMouseUp={(e) => {
+                if (e.button == 0) {
+                }
+              }}
+              width={70}
+              height={120}
+              className="cursor-pointer select-none text-black fixed bottom-[35px] left-[560px]"
+            />
+          </Tooltip>
+          <Tooltip placement="top" content="Anterior">
+            <ChevronLeftIcon
+              onClick={() => {
+                const scrollCapas = document.querySelector("#capas-box");
+                const scrollPos = scrollCapas.scrollLeft;
+
+                const scrollTotal = scrollCapas.scrollWidth;
+                const scrollInteract =
+                  scrollCapas.scrollLeft + scrollCapas.clientWidth;
+
+                console.log(scrollTotal);
+                console.log(scrollInteract);
+
+                if (scrollTotal >= scrollInteract) {
+                  scrollCapas.scrollTo({
+                    left: scrollPos - 10,
+                    behavior: "smooth",
+                  });
+                }
+              }}
+              width={70}
+              height={120}
+              className="cursor-pointer select-none text-black fixed bottom-[35px] left-[360px]"
+            />
+          </Tooltip>
+        </ul>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }

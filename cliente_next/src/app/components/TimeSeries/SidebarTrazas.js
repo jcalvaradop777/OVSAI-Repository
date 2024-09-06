@@ -201,7 +201,7 @@ const SidebarTrazas = ({ onEnviarDatos, element, id }) => {
         </ul>
       </details>
 
-      {/* <details>
+      <details>
         <summary>
           <span>Seleccione el canal</span>
         </summary>
@@ -209,12 +209,11 @@ const SidebarTrazas = ({ onEnviarDatos, element, id }) => {
           <li>
             <div>
               {subfolders ? (
-                <select onChange={handleSubfolderChange}>
-                  {subfolders.map((folder, index) => (
-                    <option key={index} value={folder}>
-                      {folder}
-                    </option>
-                  ))}
+                <select onChange={(e) => handleSubfolderChange(e.target.value)}>
+                    <option value={"mb"}>mb</option>
+                    <option value={"mc"}>mc</option>
+                    <option value={"md"}>md</option>
+                    <option value={"me"}>me</option>                    
                 </select>
               ) : (
                 <p>-----</p>
@@ -222,7 +221,7 @@ const SidebarTrazas = ({ onEnviarDatos, element, id }) => {
             </div>
           </li>
         </ul>
-      </details> */}
+      </details>
 
       <details>
         <summary>

@@ -82,5 +82,11 @@ export async function initTables() {
     "estacion VARCHAR(50)",
     "FOREIGN KEY (estacion) REFERENCES estaciones(id)" 
   ]);
+
+  await createTable("ovsaibotdatos", [
+    "id_dato int(11) AUTO_INCREMENT PRIMARY KEY",
+    "fecha_creacion VARCHAR(50) NOT NULL",
+    "input VARCHAR(500) NOT NULL",
+  ]);
  
 } // las tablas, dentro de esta llave

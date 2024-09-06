@@ -15,10 +15,14 @@ import FiltrosEstaciones from "./Estaciones/FiltrosEstaciones";
 import { ENV } from "@/config/env";
 import { useEffect, useState } from "react";
 import { runOVSAIBot } from "@/OVSAIBot";
+<<<<<<< HEAD
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRobot } from '@fortawesome/free-solid-svg-icons';
 
+=======
+import { EnterFullScreenIcon } from "@radix-ui/react-icons";
+>>>>>>> 8d6049863546a791d49b42aaf23a66490ba2ef44
 export default function Sidebar({
   Modal,
   setModal,
@@ -55,6 +59,9 @@ export default function Sidebar({
   const [chat, setChat] = useState(false);
   const [mensajes, setMensajes] = useState([]);
   const [mensaje, setMsg] = useState("");
+  const [Loading, setLoading] = useState(true);
+  const [data, setData] = useState([]);
+  const [chatFullScreen, setChatFullScreen] = useState(false); 
 
   const handleEnviarMensaje = () => {
     const obtenerBox = document.querySelector("#mensajes-chat");
@@ -69,7 +76,7 @@ export default function Sidebar({
 
       // Hacer la pregunta
 
-      runOVSAIBot(mensaje)
+      runOVSAIBot(mensaje, data)
         .then((res) => {
           setMensajes((lastMessags) => [
             ...lastMessags,
@@ -93,6 +100,21 @@ export default function Sidebar({
     }
   };
 
+  const obtenerDatos = async () => {
+    const datos = await fetch("/api/ovsaibot/data-train/get/");
+    const respuesta = await datos.json();
+
+    if (respuesta && Array.isArray(respuesta) && respuesta.length > 0) {
+      setData([
+        ...respuesta.map((r) => {
+          return {
+            text: `${r.input}`,
+          };
+        }),
+      ]);
+    }
+  };
+
   useEffect(() => {
     if (_Map != null || _Map != undefined) {
       if (last != _Map.markers.length) {
@@ -103,8 +125,15 @@ export default function Sidebar({
           })
           .catch((err) => console.error(err));
       }
+
+      if (Loading) {
+        obtenerDatos();
+        
+
+        setLoading(false);
+      }
     }
-  }, [_Map, last]);
+  }, [_Map, last]);  
 
   return (
     <>
@@ -197,11 +226,17 @@ export default function Sidebar({
           </Link>
         </div>
         */}
-        <Link
+        {/* <Link
           href={"/snmp"}
           className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
         >
           SNMP
+        </Link> */}
+        <Link
+          href={"/ovsaibothome"}
+          className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
+        >
+          OVSAIBOT Home
         </Link>
       </div>
 
@@ -216,10 +251,28 @@ export default function Sidebar({
       </button>
 
       {chat ? (
+<<<<<<< HEAD
         <div className="absolute w-72 h-96 p-0 left-[350px] bottom-2 box-border bg-slate-200 z-[2000]">
           <section className="relative w-full box-border p-2 bg-[#82A53D] text-white">
           <FontAwesomeIcon icon={faRobot} className="mr-2" />
           <strong className="font-bold">OVSAIBot</strong>
+=======
+        <div
+          className={`fixed ${
+            chatFullScreen ? "w-full h-full" : "w-72 h-96 left-[350px]"
+          } p- bottom-2 box-border bg-slate-200 z-[2000]`}
+        >
+          <section className="relative w-full box-border p-2 bg-[#82A53D] flex flex-row gap-1-">
+            <span className="align-middle justify-center">OVSAIBot</span>
+            <button
+              onClick={() => {
+                setChatFullScreen(!chatFullScreen);
+              }}
+              className="cursor-pointer select-none p-2 rounded-md absolute right-0 top-0"
+            >
+              <EnterFullScreenIcon width={30} height={30} />
+            </button>
+>>>>>>> 8d6049863546a791d49b42aaf23a66490ba2ef44
           </section>
           <section
             id="mensajes-chat"
