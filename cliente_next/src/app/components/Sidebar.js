@@ -19,6 +19,10 @@ import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Input, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRobot } from "@fortawesome/free-solid-svg-icons";
+import { EnterFullScreenIcon } from "@radix-ui/react-icons";
+
 export default function Sidebar({
   Modal,
   setModal,
@@ -107,20 +111,21 @@ export default function Sidebar({
   const obtenerDatos = async () => {
     try {
       const datos = await fetch("/api/ovsaibot/data-train/get/");
-    const respuesta = await datos.json();
+      const respuesta = await datos.json();
 
-    if (respuesta && Array.isArray(respuesta) && respuesta.length > 0) {
-      setData([
-        ...respuesta.map((r) => {
-          return {
-            text: `${r.input}`,
-          };
-        }),
-      ]);
-    }
-    } catch(err) {
-      console.error("Los datos de entrenamiento de la IA, no se pudieron cargar");
-      
+      if (respuesta && Array.isArray(respuesta) && respuesta.length > 0) {
+        setData([
+          ...respuesta.map((r) => {
+            return {
+              text: `${r.input}`,
+            };
+          }),
+        ]);
+      }
+    } catch (err) {
+      console.error(
+        "Los datos de entrenamiento de la IA, no se pudieron cargar"
+      );
     }
   };
 
@@ -242,7 +247,10 @@ export default function Sidebar({
                     <ul>
                       {filtroEstaciones.map((estacion, i) => {
                         return (
-                          <li key={`estacion-${i}`} className="m-2 w-full p-2 cursor-pointer">
+                          <li
+                            key={`estacion-${i}`}
+                            className="m-2 w-full p-2 cursor-pointer"
+                          >
                             {estacion.id} : {estacion.nombre}
                           </li>
                         );
@@ -301,14 +309,17 @@ export default function Sidebar({
           OVSAIBOT Home
         </Link>
       </div>
+
+      {/* Burbuja CHAT*/}
       <button
         className="fixed w-10 h-10 left-[300px] bottom-2 z-[2000]  text-[#82A53D] hover:animate-pulse hover:w-12 hover:h-12"
         onClick={() => {
           setChat(!chat);
         }}
       >
-        <ChatBubbleOvalLeftIcon width={36} height={36} />
+        <ChatBubbleOvalLeftIcon width={40} height={40} />
       </button>
+
       {chat ? (
         <div
           className={`fixed ${

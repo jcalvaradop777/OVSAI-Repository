@@ -16,11 +16,11 @@ export default function Dashboard() {
   let tiposTraza = [
     {
       value: "1",
-      label: "Traza geofísica",
+      label: "Anomalias",
     },
     {
       value: "2",
-      label: "Traza de teledetección",
+      label: "Telemetría",
     },
   ];
 
@@ -33,8 +33,8 @@ export default function Dashboard() {
             data={[
               {
                 type: "pie", // Change type to 'pie' for pie charts
-                values: [40, 60], // Array of data values for pie slices
-                labels: ["Category 1", "Category 2"], // Labels for each slice
+                values: [81, 19], // Array of data values for pie slices
+                labels: ["Funcional", "Anomalía"], // Labels for each slice
                 // Add these properties to customize the pie chart
                 hole: 0.4, // Set hole size (0 for no hole, 1 for full hole)
                 marker: {
@@ -44,7 +44,7 @@ export default function Dashboard() {
                 textinfo: "text+percent", // Display slice percentages as text
               },
             ]}
-            layout={{ width: 500, height: 500, title: "Pie Chart" }}
+            layout={{ width: 500, height: 500, title: "Porcentaje de funcionamiento: Arles" }}
           />
         </div>
         <div className="w-full flex flex-col shadow-lg p-2 place-content-center place-items-center items-center">
@@ -60,8 +60,8 @@ export default function Dashboard() {
             data={[
               {
                 type: "bar", // Change type to 'bar' for bar charts
-                x: ["Category 1", "Category 2", "Category 3"], // Array of category labels
-                y: [40, 60, 80], // Array of data values for each category
+                x: ["Nulo", "Atípico 2", "Salto", "Disperso", "Intermitente", "Desplazado"], // Array of category labels
+                y: [40, 12, 60, 72, 38, 56], // Array of data values for each category
                 // Add these properties to customize the bar chart
                 marker: {
                   color: "blue", // Set bar color (optional)
@@ -75,7 +75,7 @@ export default function Dashboard() {
             layout={{
               width: 500,
               height: 500,
-              title: "Número de trazas según su tipo",
+              title: "Número de trazas con anomalía",
             }}
           />
         </div>
@@ -86,7 +86,7 @@ export default function Dashboard() {
               {
                 type: "line", // Change type to 'line' for line charts
                 x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // Array of x-axis values
-                y: [2, 5, 3, 7, 2, 1, 4, 6, 3, 5], // Array of y-axis values (mountain-like pattern)
+                y: [20, 35, 43, 57, 62, 65, 74, 86, 93, 105], // Array of y-axis values (mountain-like pattern)
                 // Add these properties to customize the line chart
                 line: {
                   color: "green", // Set line color (optional)
@@ -97,7 +97,7 @@ export default function Dashboard() {
                 },
               },
             ]}
-            layout={{ width: 500, height: 500, title: "Pie Chart" }}
+            layout={{ width: 500, height: 500, title: "Anomalías acumuladas" }}
           />
         </div>
         <div className="w-full flex flex-col shadow-lg p-2 place-content-center place-items-center">
@@ -107,8 +107,8 @@ export default function Dashboard() {
             data={[
               {
                 type: "line",
-                x: [1, 2, 3, 6, 9, 12, 17, 1000], // Increased number of x-axis values
-                y: [2, 5, 3, 5, 4, 2, 8, 4], // Repeat y-axis values for larger scale
+                x: [1, 2, 3, 4, 5, 6, 7, 8], // Increased number of x-axis values
+                y: [20, 25, 13, 35, 24, 22, 38, 14], // Repeat y-axis values for larger scale
                 line: {
                   color: "green",
                   width: 3, // Increased line width
@@ -121,12 +121,12 @@ export default function Dashboard() {
             layout={{
               width: 500,
               height: 500,
-              title: "Anomalias",
+              title: "Anomalias por rango de tiempo",
               xaxis: {
-                range: [1, 1000], // Set x-axis range to match data
+                range: [0, 9], // Set x-axis range to match data
               },
               yaxis: {
-                range: [0, 10], // Set y-axis range to accommodate y-values
+                range: [0, 40], // Set y-axis range to accommodate y-values
               },
             }}
           />
@@ -135,34 +135,34 @@ export default function Dashboard() {
           <Table aria-label="Example static collection table">
             <TableHeader>
               <TableColumn>Estación</TableColumn>
-              <TableColumn>Clasificación</TableColumn>
+              <TableColumn>Sensor</TableColumn>
               <TableColumn>Estado</TableColumn>
             </TableHeader>
             <TableBody>
               <TableRow key="1">
-                <TableCell>Estación 1</TableCell>
-                <TableCell>Tipo 1</TableCell>
+                <TableCell>Arlés</TableCell>
+                <TableCell>Inclinómetro 7376</TableCell>
                 <TableCell>
                   <Chip color="success">Activo</Chip>
                 </TableCell>
               </TableRow>
               <TableRow key="2">
-                <TableCell>Estación 2</TableCell>
-                <TableCell>Tipo 2</TableCell>
+                <TableCell>Arlés</TableCell>
+                <TableCell>Digitalizador A4907</TableCell>
                 <TableCell>
                   <Chip color="default">Inactivo</Chip>
                 </TableCell>
               </TableRow>
               <TableRow key="3">
-                <TableCell>Estación 3</TableCell>
-                <TableCell>Tipo 3</TableCell>
+                <TableCell>Arléss</TableCell>
+                <TableCell>Antena</TableCell>
                 <TableCell>
                   <Chip color="danger">Problema</Chip>
                 </TableCell>
               </TableRow>
               <TableRow key="4">
-                <TableCell>Estación 4</TableCell>
-                <TableCell>Tipo 4</TableCell>
+                <TableCell>Arlés</TableCell>
+                <TableCell>Radio Modem</TableCell> 
                 <TableCell>
                   <Chip color="success">Activo</Chip>
                 </TableCell>

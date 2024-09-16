@@ -1,10 +1,14 @@
 import { useState } from "react";
 
-const SidebarTrazas = ({ onEnviarDatos, element }) => {
+const SidebarTrazas = ({ onEnviarDatos, element, id }) => {
   // onEnviarDatos es un parametro que recibe una funcion creada en la pagina de guralp que setea la variable "trazasRecibidas" con la información recibida desde Django y pueda grafiar las trazas en el lado derecho
+  // el id es el id de la estación 
 
-  const [subfolders, setSubfolders] = useState(null);
+  console.log(`id, ${id}`);
+
+  const [ruta, setRuta] = useState(null);
   const [filesNames, setfilesNames] = useState(null);
+  const [canal, setCanal] = useState(null);
   //const [trazasObox, setTrazasObox] = useState(null);
 
   const [datos, setdatos] = useState({
@@ -25,44 +29,47 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
     CERP: "ovsp_ncer",
   });
 
-  const [estacionesGuralpPrueba, setEstacionesGuralpPrueba] = useState({
-    ARLMB: "ovsp_garlmb",
-    ARLMC: "ovsp_garlmc",
-    ARLMD: "ovsp_garlmd",
-    ALRME: "ovsp_garlme"
-  })
-
   const handleDateChange = (event) => {
     // función llamada en el onChange del imput Calenario cuando se selecciona una fecha
-    fecha2Subfolders(event.target.value); // envía la fecha (event.target.value tiene la fecha seleccionada en el calendario)
+    fecha2Split(event.target.value); // envía la fecha (event.target.value tiene la fecha seleccionada en el calendario)
     setdatos({ ...datos, fecha: event.target.value });
 
     // Cargar canal y filtrar
-    
-    /* const resultadoFiltro = Object.keys(estacionesGuralpPrueba).find((estacion) => estacion.includes(element.id));
-    if(resultadoFiltro != undefined || resultadoFiltro != null) {
-      handleSubfolderChange(estacionesGuralpPrueba[resultadoFiltro]);
-    } */
+
+    // const resultadoFiltro = Object.keys(estacionesGuralp).find((estacion) => estacion.includes(element.id));
+    // if (resultadoFiltro != undefined || resultadoFiltro != null) {
+    //   handleSubfolderChange(estacionesGuralp[resultadoFiltro]);
+    // }
   };
 
-  const handleSubfolderChange = (canal) => {    
-    nombresArchivos(`ovsp_${element.id.toLowerCase()}${canal}`);
-    setdatos({ ...datos, canal: canal });
+  const handleCanalChange = (event) => {
+    const estacion = estacionesGuralp[id];
+    console.log(`id2estacion, ${estacion}`);
+    const rutaC = ruta + estacion + event.target.value
+
+    console.log(rutaC);
+    nombresArchivos(rutaC);
+    setdatos({ ...datos, canal: event.target.value });
   };
+
+  // const handleSubfolderChange = (canal) => {
+  //   nombresArchivos(canal);
+  //   setdatos({ ...datos, canal: canal });
+  // };
 
   const handleFileNamesChange = (event) => {
     //setTrazasObox("trazas");
-    console.log(event.selectedOptions);
-    
-    const selectedValues = event.target.selectedOptions != undefined
+    const selectedValues =
+      event.target.selectedOptions != undefined
         ? Array.from(event.target.selectedOptions).map((option) => option.value)
         : null;
-    console.log(selectedValues);
+    console.log(`selectedValues, ${selectedValues}`);
     if (selectedValues != null) {
       getTrazas(selectedValues, "trazas");
       setdatos({ ...datos, archivoGCF: selectedValues });
     }
   };
+
 
   const handleFileNamesChangeBox = (event) => {
     //setTrazasObox("box");
@@ -72,7 +79,7 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
     getTrazas(selectedValues, "box");
   };
 
-  const fecha2Subfolders = async (selectedDate) => {
+  const fecha2Split = async (selectedDate) => {
     // envia la fecha del calendario a la url para que sea procesada en Python
     console.log(`selectedDate, ${selectedDate}`);
     try {
@@ -92,10 +99,10 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
       }
 
       const data = await response.json(); // respuesta de django que trae los subfolders
-      setSubfolders(data.subfolder_names); // subfolder_names es el nombre dado en Django en el modulo angenteInclometroGuralp.py en la función getFilesNames
-      console.log(`subfolders, ${subfolders}`);
+      setRuta(data.rutaGcfFecha); // subfolder_names es el nombre dado en Django en el modulo angenteInclometroGuralp.py en la función getFilesNames
+      console.log(`fechaSplit, ${data.rutaGcfFecha}`);
     } catch (error) {
-      console.error("Error en obtener los subfolders:", error);
+      console.error("Error al obtener la ruta:", error);
     }
   };
 
@@ -218,6 +225,24 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
 
       <details>
         <summary>
+          <span>Canales:</span>
+        </summary>
+        <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
+          <li>
+            <div>
+              <select onChange={handleCanalChange}>
+                <option value="mb">mb</option>
+                <option value="mc">mc</option>
+                <option value="md">md</option>
+                <option value="me">me</option>
+              </select>
+            </div>
+          </li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>
           <span>Trazas:</span>
         </summary>
         <ul className="grid grid-cols-3 relative p-0 m-0 list-none gap-1">
@@ -225,7 +250,7 @@ const SidebarTrazas = ({ onEnviarDatos, element }) => {
             <div>
               {filesNames ? (
                 <select
-                  
+                  //onClick={handleFileNamesChange}
                   onChange={handleFileNamesChange}
                   size="10"
                   multiple

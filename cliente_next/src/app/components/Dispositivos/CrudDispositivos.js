@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import SaveIcon from "./SaveIcon";
 import { ENV } from "@/config/env";
+import DashboardSnmp from "../Snmp/DashboardSnmp";
 
 export default function CrudDispositivos({
   dispositivos,
@@ -61,6 +62,9 @@ export default function CrudDispositivos({
       ]);
     }
   };
+
+  const [mostrarVentanaSnmp, setVentanaSnmp] = useState(false);
+  const [serialSnmp, setSerialSnmp] = useState(null);
 
   // Función para hacer cambios, mientras se edita
   const handleHacerCambios = (e) => {
@@ -233,12 +237,6 @@ export default function CrudDispositivos({
 
   // Función para crear nuevo dispositivo en la Base de datos
   const handleNuevoDispositivo = () => {
-    // HAY QUE RECARGAR EL MAPA DESPUÉS DE ELIMINAR UNA ESTACIÓN (PREGUNTAR A SANTIAGO)
-    // AL ELIMINAR EL DISPOSITIVO NO SE ACTUALIZA LA TABLA PREGUNTAR A SANTIAGO
-    // CUANDO SE ACTUALIZA, AVECES SE REFRESCA LA TABLA AVECES NO  (SANTIAGO)
-    // HAT QE CAMBIAR LOS CONTROLES EN EL EDITAR
-    // HAY QUE HACER LISTAS CON LAS SELECCIONES ADECUADAS
-
     // Comprobamos que hay datos para insertar
     const comprobar = comprobarDatosGuardar();
     if (comprobar) {
@@ -343,6 +341,12 @@ export default function CrudDispositivos({
     return comprobar;
   }
 
+  // Función para eliminar dispostivos de la base de datos
+  const handleSnmp = (ser) => {
+    setVentanaSnmp(true);
+    setSerialSnmp(ser);
+  };
+
   useEffect(() => {
     console.log(dispositivos);
 
@@ -392,6 +396,7 @@ export default function CrudDispositivos({
             {/* Cabeceras */}
             <th>Editar/Guardar</th>
             <th>Eliminar</th>
+            <th>Metadato (SNMP)</th>
             {/* <th>ID</th> */}
             <th>Grupo</th>
             <th>Subgrupo</th>
@@ -455,6 +460,24 @@ export default function CrudDispositivos({
                   >
                     <TrashIcon className="w-5 h-5" />
                   </button>
+                </td>
+
+                {/* SNMP */}
+                <td>
+                  <button
+                    className={`btn-normal`}
+                    onClick={() => handleSnmp(dispositivo.serial)}
+                  >
+                    <TvIcon className="w-5 h-5" />
+                  </button>
+                  {mostrarVentanaSnmp ? (
+                    <DashboardSnmp
+                      setVentana={setVentanaSnmp}
+                      id_serial={serialSnmp}
+                    />
+                  ) : (
+                    <></>
+                  )}
                 </td>
 
                 {/* Registros */}

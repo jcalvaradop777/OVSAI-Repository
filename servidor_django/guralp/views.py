@@ -18,28 +18,24 @@ from spade.template import Template
 #rutaGcf = "D:/SGC/GCF/"
 #rutaGcf = "X:/"
 rutaGcf = "D:/Volcan-Project/gcf/"
-rutaGcfFecha = ""
-rutaGcfFechaSubfolder = ""
-rutaGcfFechaSubfolderFile = ""
+subfolder = ""
 
 @csrf_exempt
 def fecha2Subfolders(request):
-    global rutaGcf
-    global rutaGcfFecha
+
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
             #rutaGcf = "D:/SGC/GCF/" # Ruta local
-            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
+            rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos 
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]
             rutaGcfFecha = rutaGcf + anio + "/" + mes + "/"
             print("showRuta: ", rutaGcfFecha)
-            subfoldersNames = getSubfoldersNames(rutaGcfFecha)
-            print("subfolder_names: ", subfoldersNames)
-            return JsonResponse(subfoldersNames)
+            rutaGcf_Fecha = {'rutaGcfFecha': rutaGcfFecha}
+            return JsonResponse(rutaGcf_Fecha) #subfoldersNames
         except json.JSONDecodeError:
             pass
     else:
@@ -49,15 +45,13 @@ def fecha2Subfolders(request):
         
 @csrf_exempt
 def nombresArchivos(request):
-    global rutaGcfFecha
-    global rutaGcfFechaSubfolder
+    global subfolder
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            subfolder = data.get('selectedSubfolder')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
-            rutaGcfFechaSubfolder = rutaGcfFecha + subfolder + "/"
-            filesNames = getFilesNames(rutaGcfFechaSubfolder)
-            #print("Archivos: ", filesNames)
+            subfolder = data.get('selectedSubfolder') + "/" # Usando get para manejar el caso en el que 'selectedDate' no esté presente
+            # print("subfolder", subfolder)
+            filesNames = getFilesNames(subfolder)
             return JsonResponse(filesNames)
         except json.JSONDecodeError:
             pass
@@ -68,8 +62,7 @@ def nombresArchivos(request):
 
 @csrf_exempt
 def trazas(request):
-    global rutaGcfFechaSubfolder
-    global rutaGcfFechaSubfolderFile
+    global subfolder
     if request.method == 'POST': 
         try:
             data = json.loads(request.body)
@@ -77,11 +70,10 @@ def trazas(request):
             print("fileNamesSelected: ", fileNamesSelected)
             listaDataTrazas = []
             for fileName in fileNamesSelected:
-                rutaGcfFechaSubfolderFile = rutaGcfFechaSubfolder + fileName
-                print("rutaGcfFechaSubfolderFile ", rutaGcfFechaSubfolderFile)
-                dataTrazas = openGcf(rutaGcfFechaSubfolderFile)
+                subfolderTraza = subfolder + fileName
+                # print("subfolderTraza ", subfolder)
+                dataTrazas = openGcf(subfolderTraza)
                 listaDataTrazas.append(dataTrazas)
-            #print("dataTrazas ", dataTrazas)
             return JsonResponse(listaDataTrazas, safe=False) 
         except json.JSONDecodeError: 
             pass
@@ -99,8 +91,6 @@ def anomalias(request):
             data = json.loads(request.body)
             selected_date = data.get('selectedDate')  # Usando get para manejar el caso en el que 'selectedDate' no esté presente
             
-            #rutaGcf = "D:/SGC/GCF/" # Ruta local
-            #rutaGcf = "X:/" # Ruta en la red donde realmente están llegando los datos  
             partes = selected_date.split("-")  # Divide la cadena en partes usando el guion como separador
             anio = partes[0]
             mes = partes[1]

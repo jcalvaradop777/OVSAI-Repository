@@ -43,4 +43,11 @@ las ventanas emergentes de los componentes (pone la activación de pantalla comp
 
 db contiene la estructura en sql de la base de datos
 
-npm run nextdev  (cuando se elimina la carpenta Next de forma manual). Antes se le da npm install
+npm run nextdev  (cuando se elimina la carpenta Next de forma manual). Antes se le da: npm install
+
+___ Ejecución
+Ejecutar a base de datos en Xampp (Apache y MySql)
+
+para correr el cliente (Nextjs): npm run server 
+
+para correr el servidor (Python, Django): python112 manage.py runserver   

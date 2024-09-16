@@ -673,6 +673,7 @@ export default function CrudNscl({ nscls, setNscls, id, element }) {
       <button className="btn-create" onClick={handleNuevaFila}>
         Crear NSCL
       </button>
+
       <button className="btn-create" onClick={handleAbrirTrazas}>
         Trazas
       </button>
@@ -681,10 +682,12 @@ export default function CrudNscl({ nscls, setNscls, id, element }) {
           mostrarVentana={mostrarVentana}
           setVentana={setVentana}
           element={element}
+          id={id}
         />
       ) : (
         <></>
       )}
+      
     </>
   );
 }

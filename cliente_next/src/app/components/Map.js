@@ -84,7 +84,7 @@ export default function Map({
 
   const obtenerIconoMarcador = () => {
     const icon =
-      // icono de lacasia que representa la estación
+      // icono de la casa que representa la estación
       `<svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

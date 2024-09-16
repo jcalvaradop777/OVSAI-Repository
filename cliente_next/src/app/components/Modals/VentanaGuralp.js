@@ -6,7 +6,7 @@ import { ArrowsPointingOutIcon } from "@heroicons/react/20/solid";
 
 // Este componente es una ventana modal que muestra los datos de Guralp como trazas
 
-export default function VentanaGuralp({ mostrarVentana, setVentana, element }) {
+export default function VentanaGuralp({ mostrarVentana, setVentana, element, id}) {
   
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
 
@@ -62,7 +62,7 @@ export default function VentanaGuralp({ mostrarVentana, setVentana, element }) {
           className="p-2 relative block bg-slate-100 text-slate-800"
         >
           <div className="flex">
-            <RenderTrazaGuralp element={element} />
+            <RenderTrazaGuralp element={element} id={id} />
           </div>
         </section>
 
