@@ -4,8 +4,12 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   // Iniciamos las base de datos solo si no están creadas, es para asegurarse
-  await initTables();
-  const estaciones = await getDataFromTable('estaciones');
+  try {
+    await initTables();
+    const estaciones = await getDataFromTable("estaciones");
 
-  return NextResponse.json(estaciones);
+    return NextResponse.json(estaciones);
+  } catch (err) {
+    return NextResponse.json([]);
+  }
 }

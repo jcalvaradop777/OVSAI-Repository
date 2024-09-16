@@ -8,7 +8,12 @@ import { useEffect, useState } from "react";
 import SaveIcon from "./SaveIcon";
 import { ENV } from "@/config/env";
 
-export default function CrudDispositivos({ dispositivos, setDispositivos, id }) {  // el id es el identificador de la estación
+export default function CrudDispositivos({
+  dispositivos,
+  setDispositivos,
+  id,
+}) {
+  // el id es el identificador de la estación
 
   const [busqueda, setBusqueda] = useState("");
   const [load, setLoad] = useState(false);
@@ -18,7 +23,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
     id: 0, // Identifica a que dispositivo estamos editando
   });
 
-  const [datos, setDatos] = useState({  // de un solo registro en cuestión
+  const [datos, setDatos] = useState({
+    // de un solo registro en cuestión
     id_dispositivo: "",
     grupo: "",
     subgrupo: "",
@@ -94,18 +100,26 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
       fecha_baja: dispositivo.fecha_baja,
       inventariado: dispositivo.inventariado,
       fecha_inventariado: dispositivo.fecha_inventariado,
-      comentarios: dispositivo.comentarios
-    })
+      comentarios: dispositivo.comentarios,
+    });
   };
 
   // Función para llamar a los dispositivos de la base de datos
   const obtenerDispositivos = async () => {
-    const response = await fetch("/api/dispositivos/get/" + id);  // el id es el identificador de la estación
+    const response = await fetch("/api/dispositivos/get/" + id); // el id es el identificador de la estación
     await response
       .json()
       .then((res) => {
         //console.log("res", res);
-        setDispositivos(res.results);
+        if (response.ok) {
+          if (res.success) {
+            setDispositivos(res.results);
+          } else {
+            console.warn("No hay dispositivos");
+          }
+        } else {
+          console.error("Ha ocurrido un eror al solicitar los dispositivos");
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -113,7 +127,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
   // Nueva Fila
   const handleNuevaFila = () => {
     setNuevaFila(true);
-  }
+  };
 
   const resetearDatos = () => {
     setDatos({
@@ -141,7 +155,7 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
       fecha_inventariado: "",
       comentarios: "",
     });
-  }
+  };
 
   // Función para eliminar dispostivos de la base de datos
   const handleEliminar = (dispositivo) => {
@@ -149,28 +163,26 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
       `¿Estás seguro que deseas eliminar el dispositivo ${dispositivo.subgrupo}?`
     );
     if (confirm) {
-      const response = fetch(ENV.URLBASE + "/api/dispositivos/delete",
-        {
-          method: "DELETE",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id_dispositivo: dispositivo.id_dispositivo,
-          }),
-        }
-      );
+      const response = fetch(ENV.URLBASE + "/api/dispositivos/delete", {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_dispositivo: dispositivo.id_dispositivo,
+        }),
+      });
 
       response
-      .then((res) => {
-        console.log(res);
-        obtenerDispositivos();
-        alert("Dispositivo eliminado");
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+        .then((res) => {
+          console.log(res);
+          obtenerDispositivos();
+          alert("Dispositivo eliminado");
+        })
+        .catch((err) => {
+          console.error(err);
+        });
       resetearDatos();
     }
   };
@@ -221,7 +233,6 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
 
   // Función para crear nuevo dispositivo en la Base de datos
   const handleNuevoDispositivo = () => {
-
     // HAY QUE RECARGAR EL MAPA DESPUÉS DE ELIMINAR UNA ESTACIÓN (PREGUNTAR A SANTIAGO)
     // AL ELIMINAR EL DISPOSITIVO NO SE ACTUALIZA LA TABLA PREGUNTAR A SANTIAGO
     // CUANDO SE ACTUALIZA, AVECES SE REFRESCA LA TABLA AVECES NO  (SANTIAGO)
@@ -231,10 +242,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
     // Comprobamos que hay datos para insertar
     const comprobar = comprobarDatosGuardar();
     if (comprobar) {
-
       const comprobarDatosNoVacios = comprobarCamposVacios();
       if (comprobarDatosNoVacios) {
-
         const guadar = confirm("¿Deseas guardar los datos?");
         if (guadar) {
           // Crear dispositivo en la BD
@@ -282,16 +291,15 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
 
           setNuevaFila(false);
           resetearDatos();
-
-        } else { // Pregunta Guardar Datos
+        } else {
+          // Pregunta Guardar Datos
           setNuevaFila(false);
           LimpiarCampos();
         }
-
-      } else { // --- Datos no vacios
+      } else {
+        // --- Datos no vacios
         alert("Los campos: Serial, Grupo y Subgrupo, son requeridos.");
       }
-
     } else {
       setNuevaFila(!nuevaFila);
     }
@@ -375,46 +383,47 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
         />
       </div>
 
-
       {/* Tabla */}
-      {dispositivos != null && dispositivos.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              {" "}
-              {/* Cabeceras */}
-              <th>Editar/Guardar</th>
-              <th>Eliminar</th>
-              {/* <th>ID</th> */}
-              <th>Grupo</th>
-              <th>Subgrupo</th>
-              <th>Serial</th>
-              <th>Placa</th>
-              <th>Código bidimensional</th>
-              <th>Número de secuencia</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th>Estado</th>
-              <th>Propietario</th>
-              <th>Proveeor</th>
-              <th>Responsable</th>
-              <th>Lugar</th>
-              <th>Fecha de mantenimiento</th>
-              <th>Fecha de instalación</th>
-              <th>Fecha de retiro</th>
-              <th>Fecha de recepción</th>
-              <th>Fecha de baja</th>
-              <th>Inventariado</th>
-              <th>Fecha de inventario</th>
-              <th>Comentarios</th>
-            </tr>
-          </thead>
 
-          <tbody>
-            {filtro.map((dispositivo, i) => (
+      <table>
+        <thead>
+          <tr>
+            {" "}
+            {/* Cabeceras */}
+            <th>Editar/Guardar</th>
+            <th>Eliminar</th>
+            {/* <th>ID</th> */}
+            <th>Grupo</th>
+            <th>Subgrupo</th>
+            <th>Serial</th>
+            <th>Placa</th>
+            <th>Código bidimensional</th>
+            <th>Número de secuencia</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Estado</th>
+            <th>Propietario</th>
+            <th>Proveeor</th>
+            <th>Responsable</th>
+            <th>Lugar</th>
+            <th>Fecha de mantenimiento</th>
+            <th>Fecha de instalación</th>
+            <th>Fecha de retiro</th>
+            <th>Fecha de recepción</th>
+            <th>Fecha de baja</th>
+            <th>Inventariado</th>
+            <th>Fecha de inventario</th>
+            <th>Comentarios</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {dispositivos != null && dispositivos.length > 0 ? (
+            filtro.map((dispositivo, i) => (
               <tr key={"dispositivo-" + i}>
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <button
                       className="btn-save" // boton guardar
                       onClick={() => handleUpdateBD()}
@@ -436,10 +445,12 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 {/* boton eliminar */}
                 <td>
                   <button
-                    className={`btn-remove ${editando.estado && editando.id === dispositivo.id_dispositivo
-                      ? "btn-disabled"
-                      : ""
-                      }`}
+                    className={`btn-remove ${
+                      editando.estado &&
+                      editando.id === dispositivo.id_dispositivo
+                        ? "btn-disabled"
+                        : ""
+                    }`}
                     onClick={() => handleEliminar(dispositivo)}
                   >
                     <TrashIcon className="w-5 h-5" />
@@ -463,19 +474,28 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td> */}
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="grupo"
-                      value={(datos != null) ? datos.grupo : ""}
+                      value={datos != null ? datos.grupo : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="INSTRUMENTACIÓN">INSTRUMENTACIÓN</option>
-                      <option value="SISTEMA ELECTRICO">SISTEMA ELECTRICO</option>
-                      <option value="TELECOMUNICACIONES">TELECOMUNICACIONES</option>
+                      <option value="SISTEMA ELECTRICO">
+                        SISTEMA ELECTRICO
+                      </option>
+                      <option value="TELECOMUNICACIONES">
+                        TELECOMUNICACIONES
+                      </option>
                       <option value="ACCESORIOS">ACCESORIOS</option>
-                      <option value="EQUIPO DE SEGUIMIENTO">EQUIPO DE SEGUIMIENTO</option>
+                      <option value="EQUIPO DE SEGUIMIENTO">
+                        EQUIPO DE SEGUIMIENTO
+                      </option>
                     </select>
                   ) : (
                     <>{dispositivo.grupo}</>
@@ -483,45 +503,64 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="subgrupo"
-                      value={(datos != null) ? datos.subgrupo : ""}
+                      value={datos != null ? datos.subgrupo : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="DIGITALIZADOR">DIGITALIZADOR </option>
-                      <option value="SISMÓMETRO DE BANDA ANCHA">SISMÓMETRO DE BANDA ANCHA</option>
+                      <option value="SISMÓMETRO DE BANDA ANCHA">
+                        SISMÓMETRO DE BANDA ANCHA
+                      </option>
                       <option value="INCLINÓMETRO">INCLINÓMETRO </option>
                       <option value="PANEL SOLAR">PANEL SOLAR</option>
                       <option value="ANTENA GNSS">ANTENA GNSS</option>
                       <option value="RECEPTOR GNSS">RECEPTOR GNSS </option>
                       <option value="REGULADOR DC">REGULADOR DC</option>
-                      <option value="CONTROLADOR DE CARGA">CONTROLADOR DE CARGA</option>
+                      <option value="CONTROLADOR DE CARGA">
+                        CONTROLADOR DE CARGA
+                      </option>
                       <option value="ANTENA">ANTENA</option>
                       <option value="SWITCH">SWITCH</option>
-                      <option value="SENSOR DE INFRASONIDO">SENSOR DE INFRASONIDO</option>
+                      <option value="SENSOR DE INFRASONIDO">
+                        SENSOR DE INFRASONIDO
+                      </option>
                       <option value="CÁMARA WEB">CÁMARA WEB</option>
                       <option value="TERMOCUPLA">TERMOCUPLA</option>
-                      <option value="GABINETE DE ACERO">GABINETE DE ACERO</option>
+                      <option value="GABINETE DE ACERO">
+                        GABINETE DE ACERO
+                      </option>
                       <option value="TELESCOPIO">TELESCOPIO</option>
                       <option value="FIBRA ÓPTICA">FIBRA ÓPTICA</option>
                       <option value="ESPECTRÓMETRO">ESPECTRÓMETRO</option>
                       <option value="PC INTREGRADO">PC INTREGRADO</option>
                       <option value="ANTENA DE GPS">ANTENA DE GPS</option>
-                      <option value="SISMOMETRO/DIGITALIZADOR">SISMOMETRO/DIGITALIZADOR</option>
-                      <option value="SISMÓMETRO CORTO PERIODO TRIAXIAL">SISMÓMETRO CORTO PERIODO TRIAXIAL</option>
+                      <option value="SISMOMETRO/DIGITALIZADOR">
+                        SISMOMETRO/DIGITALIZADOR
+                      </option>
+                      <option value="SISMÓMETRO CORTO PERIODO TRIAXIAL">
+                        SISMÓMETRO CORTO PERIODO TRIAXIAL
+                      </option>
                       <option value="BASE NIVELANTE">BASE NIVELANTE</option>
                       <option value="SENSOR DE RADÓN">SENSOR DE RADÓN</option>
                       <option value="RADIO">RADIO</option>
                       <option value="ELEVADOR POE">ELEVADOR POE</option>
-                      <option value="ACELERÓMETRO/DIGITALIZADOR">ACELERÓMETRO/DIGITALIZADOR</option>
+                      <option value="ACELERÓMETRO/DIGITALIZADOR">
+                        ACELERÓMETRO/DIGITALIZADOR
+                      </option>
                       <option value="MAGNETÓMETRO">MAGNETÓMETRO</option>
                       <option value="DIGITALIZADOR">DIGITALIZADOR</option>
                       <option value="PLUVIÓMETRO">PLUVIÓMETRO</option>
                       <option value="BATERIA">BATERIA</option>
-                      <option value="ANALIZADOR DE ESPECTRO">ANALIZADOR DE ESPECTRO</option>
+                      <option value="ANALIZADOR DE ESPECTRO">
+                        ANALIZADOR DE ESPECTRO
+                      </option>
                       <option value="SCANDOAS">SCANDOAS</option>
                     </select>
                   ) : (
@@ -531,7 +570,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
 
                 <td>
                   {" "}
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
@@ -545,7 +585,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
@@ -559,7 +600,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
@@ -573,7 +615,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
@@ -587,17 +630,22 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="marca"
-                      value={(datos != null) ? datos.marca : ""}
+                      value={datos != null ? datos.marca : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="GURALP">GURALP</option>
                       <option value="NANOMETRICS">NANOMETRICS</option>
-                      <option value="APPLIED GEOMECHANICS">APPLIED GEOMECHANICS</option>
+                      <option value="APPLIED GEOMECHANICS">
+                        APPLIED GEOMECHANICS
+                      </option>
                       <option value="ZYTECH">ZYTECH</option>
                       <option value="FREEWAVE">FREEWAVE</option>
                       <option value="TRIMBLE">TRIMBLE</option>
@@ -607,9 +655,13 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                       <option value="PCTEL BLUEWAVE">PCTEL BLUEWAVE</option>
                       <option value="3ONEDATA">3ONEDATA</option>
                       <option value="TOPCON">TOPCON</option>
-                      <option value="CHAPARRAL PHYSICS">CHAPARRAL PHYSICS</option>
+                      <option value="CHAPARRAL PHYSICS">
+                        CHAPARRAL PHYSICS
+                      </option>
                       <option value="PEIMAR">PEIMAR</option>
-                      <option value="TRACER SERIES/EPEVER">TRACER SERIES/EPEVER</option>
+                      <option value="TRACER SERIES/EPEVER">
+                        TRACER SERIES/EPEVER
+                      </option>
                       <option value="SIXNET">SIXNET</option>
                       <option value="VIVOTEC">VIVOTEC</option>
                       <option value="JEWELL">JEWELL</option>
@@ -631,7 +683,9 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                       <option value="INTUICOM">INTUICOM</option>
                       <option value="LARSEN">LARSEN</option>
                       <option value="DAHUA">DAHUA</option>
-                      <option value="MARPED MANUFACTURAS">MARPED MANUFACTURAS</option>
+                      <option value="MARPED MANUFACTURAS">
+                        MARPED MANUFACTURAS
+                      </option>
                       <option value="REFTEK">REFTEK</option>
                       <option value="BASE NIVELANTE">BASE NIVELANTE</option>
                       <option value="ALGADE">ALGADE</option>
@@ -639,11 +693,15 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                       <option value="MOXA">MOXA</option>
                       <option value="AIR 802">AIR 802</option>
                       <option value="SCHÜLER WEAGE">SCHÜLER WEAGE</option>
-                      <option value="SENSYS / STEFAN MAYER INSTRUMENTS">SENSYS / STEFAN MAYER INSTRUMENTS</option>
+                      <option value="SENSYS / STEFAN MAYER INSTRUMENTS">
+                        SENSYS / STEFAN MAYER INSTRUMENTS
+                      </option>
                       <option value="STC">STC</option>
                       <option value="WALEKER">WALEKER</option>
                       <option value="SGC">SGC</option>
-                      <option value="POWER OVER ETHERNET">POWER OVER ETHERNET</option>
+                      <option value="POWER OVER ETHERNET">
+                        POWER OVER ETHERNET
+                      </option>
                       <option value="SOLAREX">SOLAREX</option>
                       <option value="VISION">VISION</option>
                       <option value="ANRITSU">ANRITSU</option>
@@ -657,7 +715,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
@@ -671,14 +730,17 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="estado"
-                      value={(datos != null) ? datos.estado : ""}
+                      value={datos != null ? datos.estado : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="EN DIAGNOSTICO">EN DIAGNOSTICO</option>
                       <option value="FUNCIONAL">FUNCIONAL</option>
                       <option value="EN TRANSITO">EN TRANSITO</option>
@@ -689,14 +751,17 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="propietario"
-                      value={(datos != null) ? datos.propietario : ""}
+                      value={datos != null ? datos.propietario : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="SGC">SGC</option>
                       <option value="ALCALDIA PASTO">ALCALDIA PASTO</option>
                     </select>
@@ -706,19 +771,26 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="proveedor"
-                      value={(datos != null) ? datos.proveedor : ""}
+                      value={datos != null ? datos.proveedor : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="AMPERE">AMPERE</option>
                       <option value="SANDOX">SANDOX</option>
-                      <option value="DATUM INGENIERÍA SAS">DATUM INGENIERÍA SAS</option>
+                      <option value="DATUM INGENIERÍA SAS">
+                        DATUM INGENIERÍA SAS
+                      </option>
                       <option value="DIRIMPEX SAS">DIRIMPEX SAS</option>
-                      <option value="GEOSYSTEM INGENIERÍA SAS">GEOSYSTEM INGENIERÍA SAS</option>
+                      <option value="GEOSYSTEM INGENIERÍA SAS">
+                        GEOSYSTEM INGENIERÍA SAS
+                      </option>
                       <option value="SANDOX">SANDOX</option>
                       <option value="SSI">SSI</option>
                       <option value="CHALMERS">CHALMERS</option>
@@ -731,15 +803,20 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="responsable"
-                      value={(datos != null) ? datos.responsable : ""}
+                      value={datos != null ? datos.responsable : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
-                      <option value="SERVICIO GEOLOGICO COLOMBIANO">SERVICIO GEOLOGICO COLOMBIANO</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
+                      <option value="SERVICIO GEOLOGICO COLOMBIANO">
+                        SERVICIO GEOLOGICO COLOMBIANO
+                      </option>
                     </select>
                   ) : (
                     <>{dispositivo.responsable}</>
@@ -747,18 +824,27 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="lugar"
-                      value={(datos != null) ? datos.lugar : ""}
+                      value={datos != null ? datos.lugar : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
-                      <option value="LABORATORIO ELECTRONICA">LABORATORIO ELECTRONICA</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
+                      <option value="LABORATORIO ELECTRONICA">
+                        LABORATORIO ELECTRONICA
+                      </option>
                       <option value="ESTACION">ESTACION</option>
-                      <option value="BODEGA ELECTRONICA">BODEGA ELECTRONICA</option>
-                      <option value="BODEGA DEFORMACIÓN">BODEGA DEFORMACIÓN</option>
+                      <option value="BODEGA ELECTRONICA">
+                        BODEGA ELECTRONICA
+                      </option>
+                      <option value="BODEGA DEFORMACIÓN">
+                        BODEGA DEFORMACIÓN
+                      </option>
                     </select>
                   ) : (
                     <>{dispositivo.lugar}</>
@@ -766,7 +852,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="date"
@@ -780,7 +867,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="date"
@@ -794,7 +882,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="date"
@@ -808,7 +897,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="date"
@@ -822,7 +912,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="date"
@@ -836,14 +927,17 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <select
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       name="inventariado"
-                      value={(datos != null) ? datos.inventariado : ""}
+                      value={datos != null ? datos.inventariado : ""}
                       onChange={handleHacerCambios}
                     >
-                      <option value="0">..........................................</option>
+                      <option value="0">
+                        ..........................................
+                      </option>
                       <option value="Inventariado">Inventariado</option>
                       <option value="No Inventariado">No Inventariado</option>
                     </select>
@@ -853,7 +947,8 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="date"
@@ -867,9 +962,12 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                 </td>
 
                 <td>
-                  {editando.estado && editando.id === dispositivo.id_dispositivo ? (
+                  {editando.estado &&
+                  editando.id === dispositivo.id_dispositivo ? (
                     <textarea
-                      name="comentarios" rows="4" cols="40"
+                      name="comentarios"
+                      rows="4"
+                      cols="40"
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
                       value={datos.comentarios}
@@ -879,30 +977,28 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                     <>{dispositivo.comentarios}</>
                   )}
                 </td>
-
               </tr>
+            ))
+          ) : (
+            <></>
+          )}
 
-            ))}
+          {nuevaFila ? (
+            <>
+              <tr>
+                <td>
+                  <button
+                    className="btn-save"
+                    onClick={handleNuevoDispositivo}
+                    title="Editar/Guardar"
+                  >
+                    <SaveIcon className="w-5 h-5 text-white" />
+                  </button>
+                </td>
 
-            {nuevaFila ? (
-              <>
-                <tr>
+                <td> </td>
 
-                  <td>
-                    <button
-                      className="btn-save"
-                      onClick={handleNuevoDispositivo}
-                      title="Editar/Guardar"
-                    >
-                      <SaveIcon className="w-5 h-5 text-white" />
-                    </button>
-                  </td>
-
-                  <td>
-                    {" "}
-                  </td>
-
-                  {/* <td>
+                {/* <td>
                     <input
                       className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
                       type="text"
@@ -912,246 +1008,302 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                     />
                   </td> */}
 
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="grupo"
-                      onChange={handleHacerCambios}
-                      required
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="INSTRUMENTACIÓN">INSTRUMENTACIÓN</option>
-                      <option value="SISTEMA ELECTRICO">SISTEMA ELECTRICO</option>
-                      <option value="TELECOMUNICACIONES">TELECOMUNICACIONES</option>
-                      <option value="ACCESORIOS">ACCESORIOS</option>
-                      <option value="EQUIPO DE SEGUIMIENTO">EQUIPO DE SEGUIMIENTO</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="subgrupo"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="DIGITALIZADOR">DIGITALIZADOR </option>
-                      <option value="SISMÓMETRO DE BANDA ANCHA">SISMÓMETRO DE BANDA ANCHA</option>
-                      <option value="INCLINÓMETRO">INCLINÓMETRO </option>
-                      <option value="PANEL SOLAR">PANEL SOLAR</option>
-                      <option value="ANTENA GNSS">ANTENA GNSS</option>
-                      <option value="RECEPTOR GNSS">RECEPTOR GNSS </option>
-                      <option value="REGULADOR DC">REGULADOR DC</option>
-                      <option value="CONTROLADOR DE CARGA">CONTROLADOR DE CARGA</option>
-                      <option value="ANTENA">ANTENA</option>
-                      <option value="SWITCH">SWITCH</option>
-                      <option value="SENSOR DE INFRASONIDO">SENSOR DE INFRASONIDO</option>
-                      <option value="CÁMARA WEB">CÁMARA WEB</option>
-                      <option value="TERMOCUPLA">TERMOCUPLA</option>
-                      <option value="GABINETE DE ACERO">GABINETE DE ACERO</option>
-                      <option value="TELESCOPIO">TELESCOPIO</option>
-                      <option value="FIBRA ÓPTICA">FIBRA ÓPTICA</option>
-                      <option value="ESPECTRÓMETRO">ESPECTRÓMETRO</option>
-                      <option value="PC INTREGRADO">PC INTREGRADO</option>
-                      <option value="ANTENA DE GPS">ANTENA DE GPS</option>
-                      <option value="SISMOMETRO/DIGITALIZADOR">SISMOMETRO/DIGITALIZADOR</option>
-                      <option value="SISMÓMETRO CORTO PERIODO TRIAXIAL">SISMÓMETRO CORTO PERIODO TRIAXIAL</option>
-                      <option value="BASE NIVELANTE">BASE NIVELANTE</option>
-                      <option value="SENSOR DE RADÓN">SENSOR DE RADÓN</option>
-                      <option value="RADIO">RADIO</option>
-                      <option value="ELEVADOR POE">ELEVADOR POE</option>
-                      <option value="ACELERÓMETRO/DIGITALIZADOR">ACELERÓMETRO/DIGITALIZADOR</option>
-                      <option value="MAGNETÓMETRO">MAGNETÓMETRO</option>
-                      <option value="DIGITALIZADOR">DIGITALIZADOR</option>
-                      <option value="PLUVIÓMETRO">PLUVIÓMETRO</option>
-                      <option value="BATERIA">BATERIA</option>
-                      <option value="ANALIZADOR DE ESPECTRO">ANALIZADOR DE ESPECTRO</option>
-                      <option value="SCANDOAS">SCANDOAS</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="serial"
-                      onChange={handleHacerCambios}
-                      required
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="placa"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="codigo_bidimensional"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="secuencia"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="marca"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="GURALP">GURALP</option>
-                      <option value="NANOMETRICS">NANOMETRICS</option>
-                      <option value="APPLIED GEOMECHANICS">APPLIED GEOMECHANICS</option>
-                      <option value="ZYTECH">ZYTECH</option>
-                      <option value="FREEWAVE">FREEWAVE</option>
-                      <option value="TRIMBLE">TRIMBLE</option>
-                      <option value="EVER EXCEED">EVER EXCEED</option>
-                      <option value="MORNINGSTAR">MORNINGSTAR</option>
-                      <option value="BRICK ELECTRIC">BRICK ELECTRIC</option>
-                      <option value="PCTEL BLUEWAVE">PCTEL BLUEWAVE</option>
-                      <option value="3ONEDATA">3ONEDATA</option>
-                      <option value="TOPCON">TOPCON</option>
-                      <option value="CHAPARRAL PHYSICS">CHAPARRAL PHYSICS</option>
-                      <option value="PEIMAR">PEIMAR</option>
-                      <option value="TRACER SERIES/EPEVER">TRACER SERIES/EPEVER</option>
-                      <option value="SIXNET">SIXNET</option>
-                      <option value="VIVOTEC">VIVOTEC</option>
-                      <option value="JEWELL">JEWELL</option>
-                      <option value="SOLARTECH">SOLARTECH</option>
-                      <option value="BP SOLAR">BP SOLAR</option>
-                      <option value="KYOCERA">KYOCERA</option>
-                      <option value="XETAWAVE ">XETAWAVE </option>
-                      <option value="GAMATEC">GAMATEC</option>
-                      <option value="EPEVER">EPEVER</option>
-                      <option value="OMEGA">OMEGA</option>
-                      <option value="NUDAM">NUDAM</option>
-                      <option value="UBIQUITI">UBIQUITI</option>
-                      <option value="NO TIENE">NO TIENE</option>
-                      <option value="CHALMERS">CHALMERS</option>
-                      <option value="OCEAN OPTICS">OCEAN OPTICS</option>
-                      <option value="GLOBALSAT">GLOBALSAT</option>
-                      <option value="SILICON SOLAR">SILICON SOLAR</option>
-                      <option value="SERCEL">SERCEL</option>
-                      <option value="INTUICOM">INTUICOM</option>
-                      <option value="LARSEN">LARSEN</option>
-                      <option value="DAHUA">DAHUA</option>
-                      <option value="MARPED MANUFACTURAS">MARPED MANUFACTURAS</option>
-                      <option value="REFTEK">REFTEK</option>
-                      <option value="BASE NIVELANTE">BASE NIVELANTE</option>
-                      <option value="ALGADE">ALGADE</option>
-                      <option value="CANADIAN SOLAR">CANADIAN SOLAR</option>
-                      <option value="MOXA">MOXA</option>
-                      <option value="AIR 802">AIR 802</option>
-                      <option value="SCHÜLER WEAGE">SCHÜLER WEAGE</option>
-                      <option value="SENSYS / STEFAN MAYER INSTRUMENTS">SENSYS / STEFAN MAYER INSTRUMENTS</option>
-                      <option value="STC">STC</option>
-                      <option value="WALEKER">WALEKER</option>
-                      <option value="SGC">SGC</option>
-                      <option value="POWER OVER ETHERNET">POWER OVER ETHERNET</option>
-                      <option value="SOLAREX">SOLAREX</option>
-                      <option value="VISION">VISION</option>
-                      <option value="ANRITSU">ANRITSU</option>
-                      <option value="GEÓNICA">GEÓNICA</option>
-                      <option value="SINCLAIR">SINCLAIR</option>
-                      <option value="SURSUM">SURSUM</option>
-                    </select>
-                  </td>
-
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      name="modelo"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                  <td>
-                    <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="estado"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="EN DIAGNOSTICO">EN DIAGNOSTICO</option>
-                      <option value="FUNCIONAL">FUNCIONAL</option>
-                      <option value="EN TRANSITO">EN TRANSITO</option>
-                    </select>
-                  </td>
-
-                  <td>
+                <td>
                   <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="propietario"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="SGC">SGC</option>
-                      <option value="ALCALDIA PASTO">ALCALDIA PASTO</option>
-                    </select>
-                  </td>
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="grupo"
+                    onChange={handleHacerCambios}
+                    required
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="INSTRUMENTACIÓN">INSTRUMENTACIÓN</option>
+                    <option value="SISTEMA ELECTRICO">SISTEMA ELECTRICO</option>
+                    <option value="TELECOMUNICACIONES">
+                      TELECOMUNICACIONES
+                    </option>
+                    <option value="ACCESORIOS">ACCESORIOS</option>
+                    <option value="EQUIPO DE SEGUIMIENTO">
+                      EQUIPO DE SEGUIMIENTO
+                    </option>
+                  </select>
+                </td>
 
-                  <td>
+                <td>
                   <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="proveedor"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="AMPERE">AMPERE</option>
-                      <option value="SANDOX">SANDOX</option>
-                      <option value="DATUM INGENIERÍA SAS">DATUM INGENIERÍA SAS</option>
-                      <option value="DIRIMPEX SAS">DIRIMPEX SAS</option>
-                      <option value="GEOSYSTEM INGENIERÍA SAS">GEOSYSTEM INGENIERÍA SAS</option>
-                      <option value="SANDOX">SANDOX</option>
-                      <option value="SSI">SSI</option>
-                      <option value="CHALMERS">CHALMERS</option>
-                      <option value="METRICOM">METRICOM</option>
-                      <option value="SIN PROVEEDOR">SIN PROVEEDOR</option>
-                    </select>
-                  </td>
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="subgrupo"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="DIGITALIZADOR">DIGITALIZADOR </option>
+                    <option value="SISMÓMETRO DE BANDA ANCHA">
+                      SISMÓMETRO DE BANDA ANCHA
+                    </option>
+                    <option value="INCLINÓMETRO">INCLINÓMETRO </option>
+                    <option value="PANEL SOLAR">PANEL SOLAR</option>
+                    <option value="ANTENA GNSS">ANTENA GNSS</option>
+                    <option value="RECEPTOR GNSS">RECEPTOR GNSS </option>
+                    <option value="REGULADOR DC">REGULADOR DC</option>
+                    <option value="CONTROLADOR DE CARGA">
+                      CONTROLADOR DE CARGA
+                    </option>
+                    <option value="ANTENA">ANTENA</option>
+                    <option value="SWITCH">SWITCH</option>
+                    <option value="SENSOR DE INFRASONIDO">
+                      SENSOR DE INFRASONIDO
+                    </option>
+                    <option value="CÁMARA WEB">CÁMARA WEB</option>
+                    <option value="TERMOCUPLA">TERMOCUPLA</option>
+                    <option value="GABINETE DE ACERO">GABINETE DE ACERO</option>
+                    <option value="TELESCOPIO">TELESCOPIO</option>
+                    <option value="FIBRA ÓPTICA">FIBRA ÓPTICA</option>
+                    <option value="ESPECTRÓMETRO">ESPECTRÓMETRO</option>
+                    <option value="PC INTREGRADO">PC INTREGRADO</option>
+                    <option value="ANTENA DE GPS">ANTENA DE GPS</option>
+                    <option value="SISMOMETRO/DIGITALIZADOR">
+                      SISMOMETRO/DIGITALIZADOR
+                    </option>
+                    <option value="SISMÓMETRO CORTO PERIODO TRIAXIAL">
+                      SISMÓMETRO CORTO PERIODO TRIAXIAL
+                    </option>
+                    <option value="BASE NIVELANTE">BASE NIVELANTE</option>
+                    <option value="SENSOR DE RADÓN">SENSOR DE RADÓN</option>
+                    <option value="RADIO">RADIO</option>
+                    <option value="ELEVADOR POE">ELEVADOR POE</option>
+                    <option value="ACELERÓMETRO/DIGITALIZADOR">
+                      ACELERÓMETRO/DIGITALIZADOR
+                    </option>
+                    <option value="MAGNETÓMETRO">MAGNETÓMETRO</option>
+                    <option value="DIGITALIZADOR">DIGITALIZADOR</option>
+                    <option value="PLUVIÓMETRO">PLUVIÓMETRO</option>
+                    <option value="BATERIA">BATERIA</option>
+                    <option value="ANALIZADOR DE ESPECTRO">
+                      ANALIZADOR DE ESPECTRO
+                    </option>
+                    <option value="SCANDOAS">SCANDOAS</option>
+                  </select>
+                </td>
 
-                  <td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="serial"
+                    onChange={handleHacerCambios}
+                    required
+                  />
+                </td>
+
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="placa"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
+
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="codigo_bidimensional"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
+
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="secuencia"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
+
+                <td>
                   <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="responsable"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="SERVICIO GEOLOGICO COLOMBIANO">SERVICIO GEOLOGICO COLOMBIANO</option>
-                    </select>
-                  </td>
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="marca"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="GURALP">GURALP</option>
+                    <option value="NANOMETRICS">NANOMETRICS</option>
+                    <option value="APPLIED GEOMECHANICS">
+                      APPLIED GEOMECHANICS
+                    </option>
+                    <option value="ZYTECH">ZYTECH</option>
+                    <option value="FREEWAVE">FREEWAVE</option>
+                    <option value="TRIMBLE">TRIMBLE</option>
+                    <option value="EVER EXCEED">EVER EXCEED</option>
+                    <option value="MORNINGSTAR">MORNINGSTAR</option>
+                    <option value="BRICK ELECTRIC">BRICK ELECTRIC</option>
+                    <option value="PCTEL BLUEWAVE">PCTEL BLUEWAVE</option>
+                    <option value="3ONEDATA">3ONEDATA</option>
+                    <option value="TOPCON">TOPCON</option>
+                    <option value="CHAPARRAL PHYSICS">CHAPARRAL PHYSICS</option>
+                    <option value="PEIMAR">PEIMAR</option>
+                    <option value="TRACER SERIES/EPEVER">
+                      TRACER SERIES/EPEVER
+                    </option>
+                    <option value="SIXNET">SIXNET</option>
+                    <option value="VIVOTEC">VIVOTEC</option>
+                    <option value="JEWELL">JEWELL</option>
+                    <option value="SOLARTECH">SOLARTECH</option>
+                    <option value="BP SOLAR">BP SOLAR</option>
+                    <option value="KYOCERA">KYOCERA</option>
+                    <option value="XETAWAVE ">XETAWAVE </option>
+                    <option value="GAMATEC">GAMATEC</option>
+                    <option value="EPEVER">EPEVER</option>
+                    <option value="OMEGA">OMEGA</option>
+                    <option value="NUDAM">NUDAM</option>
+                    <option value="UBIQUITI">UBIQUITI</option>
+                    <option value="NO TIENE">NO TIENE</option>
+                    <option value="CHALMERS">CHALMERS</option>
+                    <option value="OCEAN OPTICS">OCEAN OPTICS</option>
+                    <option value="GLOBALSAT">GLOBALSAT</option>
+                    <option value="SILICON SOLAR">SILICON SOLAR</option>
+                    <option value="SERCEL">SERCEL</option>
+                    <option value="INTUICOM">INTUICOM</option>
+                    <option value="LARSEN">LARSEN</option>
+                    <option value="DAHUA">DAHUA</option>
+                    <option value="MARPED MANUFACTURAS">
+                      MARPED MANUFACTURAS
+                    </option>
+                    <option value="REFTEK">REFTEK</option>
+                    <option value="BASE NIVELANTE">BASE NIVELANTE</option>
+                    <option value="ALGADE">ALGADE</option>
+                    <option value="CANADIAN SOLAR">CANADIAN SOLAR</option>
+                    <option value="MOXA">MOXA</option>
+                    <option value="AIR 802">AIR 802</option>
+                    <option value="SCHÜLER WEAGE">SCHÜLER WEAGE</option>
+                    <option value="SENSYS / STEFAN MAYER INSTRUMENTS">
+                      SENSYS / STEFAN MAYER INSTRUMENTS
+                    </option>
+                    <option value="STC">STC</option>
+                    <option value="WALEKER">WALEKER</option>
+                    <option value="SGC">SGC</option>
+                    <option value="POWER OVER ETHERNET">
+                      POWER OVER ETHERNET
+                    </option>
+                    <option value="SOLAREX">SOLAREX</option>
+                    <option value="VISION">VISION</option>
+                    <option value="ANRITSU">ANRITSU</option>
+                    <option value="GEÓNICA">GEÓNICA</option>
+                    <option value="SINCLAIR">SINCLAIR</option>
+                    <option value="SURSUM">SURSUM</option>
+                  </select>
+                </td>
 
-                  <td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    name="modelo"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
+
+                <td>
                   <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="lugar"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="LABORATORIO ELECTRONICA">LABORATORIO ELECTRONICA</option>
-                      <option value="ESTACION">ESTACION</option>
-                      <option value="BODEGA ELECTRONICA">BODEGA ELECTRONICA</option>
-                      <option value="BODEGA DEFORMACIÓN">BODEGA DEFORMACIÓN</option>
-                    </select>
-                  </td>
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="estado"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="EN DIAGNOSTICO">EN DIAGNOSTICO</option>
+                    <option value="FUNCIONAL">FUNCIONAL</option>
+                    <option value="EN TRANSITO">EN TRANSITO</option>
+                  </select>
+                </td>
 
-                  {/* <td>
+                <td>
+                  <select
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="propietario"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="SGC">SGC</option>
+                    <option value="ALCALDIA PASTO">ALCALDIA PASTO</option>
+                  </select>
+                </td>
+
+                <td>
+                  <select
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="proveedor"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="AMPERE">AMPERE</option>
+                    <option value="SANDOX">SANDOX</option>
+                    <option value="DATUM INGENIERÍA SAS">
+                      DATUM INGENIERÍA SAS
+                    </option>
+                    <option value="DIRIMPEX SAS">DIRIMPEX SAS</option>
+                    <option value="GEOSYSTEM INGENIERÍA SAS">
+                      GEOSYSTEM INGENIERÍA SAS
+                    </option>
+                    <option value="SANDOX">SANDOX</option>
+                    <option value="SSI">SSI</option>
+                    <option value="CHALMERS">CHALMERS</option>
+                    <option value="METRICOM">METRICOM</option>
+                    <option value="SIN PROVEEDOR">SIN PROVEEDOR</option>
+                  </select>
+                </td>
+
+                <td>
+                  <select
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="responsable"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="SERVICIO GEOLOGICO COLOMBIANO">
+                      SERVICIO GEOLOGICO COLOMBIANO
+                    </option>
+                  </select>
+                </td>
+
+                <td>
+                  <select
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="lugar"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="LABORATORIO ELECTRONICA">
+                      LABORATORIO ELECTRONICA
+                    </option>
+                    <option value="ESTACION">ESTACION</option>
+                    <option value="BODEGA ELECTRONICA">
+                      BODEGA ELECTRONICA
+                    </option>
+                    <option value="BODEGA DEFORMACIÓN">
+                      BODEGA DEFORMACIÓN
+                    </option>
+                  </select>
+                </td>
+
+                {/* <td>
                     <input
                       type="text"
                       name="estacion"
@@ -1159,97 +1311,97 @@ export default function CrudDispositivos({ dispositivos, setDispositivos, id }) 
                     />
                   </td> */}
 
-                  <td>
-                    <input
-                      type="date"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="fecha_mantenimiento"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    type="date"
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="fecha_mantenimiento"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      type="date"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="fecha_instalacion"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    type="date"
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="fecha_instalacion"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="date"
-                      name="fecha_retiro"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="date"
+                    name="fecha_retiro"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="date"
-                      name="fecha_recepcion"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="date"
+                    name="fecha_recepcion"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <input
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="date"
-                      name="fecha_baja"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="date"
+                    name="fecha_baja"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
+                <td>
                   <select
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="inventariado"
-                      onChange={handleHacerCambios}
-                    >
-                      <option value="0">..........................................</option>
-                      <option value="Inventariado">Inventariado</option>
-                      <option value="No Inventariado">No Inventariado</option>
-                    </select>
-                  </td>
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="inventariado"
+                    onChange={handleHacerCambios}
+                  >
+                    <option value="0">
+                      ..........................................
+                    </option>
+                    <option value="Inventariado">Inventariado</option>
+                    <option value="No Inventariado">No Inventariado</option>
+                  </select>
+                </td>
 
-                  <td>
-                    <input
-                      type="date"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      name="fecha_inventariado"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
+                <td>
+                  <input
+                    type="date"
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    name="fecha_inventariado"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
 
-                  <td>
-                    <textarea name="comentarios" rows="4" cols="40"
-                      className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
-                      type="text"
-                      id="comentarios"
-                      placeholder="Escriba un comentario"
-                      onChange={handleHacerCambios}
-                    />
-                  </td>
-
-                </tr>
-              </>
-            ) : (
-              <></>
-            )}
-          </tbody>
-        </table>
-      ) : (
-        <h3>No hay dispositivos.</h3>
-      )}
+                <td>
+                  <textarea
+                    name="comentarios"
+                    rows="4"
+                    cols="40"
+                    className="text-gray-700 bg-gray-100 border border-[#C4D92E] rounded p-2 focus:outline-none focus:ring-2 focus:ring-[#82A53D]"
+                    type="text"
+                    id="comentarios"
+                    placeholder="Escriba un comentario"
+                    onChange={handleHacerCambios}
+                  />
+                </td>
+              </tr>
+            </>
+          ) : (
+            <></>
+          )}
+        </tbody>
+      </table>
 
       <button className="btn-create" onClick={handleNuevaFila}>
         Crear dispositivo
       </button>
-
     </>
   );
 }

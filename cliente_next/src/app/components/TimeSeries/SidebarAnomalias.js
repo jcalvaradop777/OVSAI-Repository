@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 const SidebarAnomalias = ({ onEnviarDatos }) => { // para pasarle datos a otra pagina
 
   const handleDateChange = (event) => { // función llamada en el onChange del imput Calenario cuando se selecciona una fecha

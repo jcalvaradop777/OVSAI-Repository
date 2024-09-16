@@ -248,7 +248,10 @@ export default function Map({
     // Aqui se ponen los controles de la derecha en el mapa
     map.current = new maptilersdk.Map({
       container: mapContainer.current,
-      style: mapStyle === "temperature" || mapStyle === "weather" ? "backdrop" : mapStyle,
+      style:
+        mapStyle === "temperature" || mapStyle === "weather"
+          ? "backdrop"
+          : mapStyle,
       center: [ovspa.lng, ovspa.lat],
       zoom: zoom,
       hash: true,
@@ -273,12 +276,16 @@ export default function Map({
       //weatherLayer.animateByFactor(3600);
     }
 
-    if(mapStyle === "weather") {
+    if (mapStyle === "weather") {
       const weatherLayer = new WindLayer();
 
-      map.current.on('load', function () {
-        map.current.setPaintProperty("Water", 'fill-color', "rgba(0, 0, 0, 0.4)");
-        map.current.addLayer(weatherLayer, 'Water');
+      map.current.on("load", function () {
+        map.current.setPaintProperty(
+          "Water",
+          "fill-color",
+          "rgba(0, 0, 0, 0.4)"
+        );
+        map.current.addLayer(weatherLayer, "Water");
       });
     }
   }, [ovspa.lng, ovspa.lat, zoom, show, _Map, selected]);
@@ -321,9 +328,13 @@ export default function Map({
           id="capas-box"
           className="left-[365px] list-none p-2 rounded-lg bottom-14 fixed w-64 h-20 overflow-x-hidden flex flex-row gap-2 overflow-y-hidden bg-white"
         >
-          {capas.map((capa) => {
+          {capas.map((capa, index) => {
             return (
-              <Tooltip placement="top" content={capa.style}>
+              <Tooltip
+                key={`capa-${index}`}
+                placement="top"
+                content={capa.style}
+              >
                 <Image
                   onClick={() => {
                     setMapStyle(capa.setStyle);
@@ -361,33 +372,6 @@ export default function Map({
                     left: scrollPos + 10,
                     behavior: "smooth",
                   });
-                }
-              }}
-              onMouseDown={(e) => {
-                if (e.button == 0) {
-                  /* setInterval(() => {
-                    console.log(e);
-                  }, 500); */
-                  /*
-                    setInterval(() => {
-                    const scrollCapas = document.querySelector("#capas-box");
-                    const scrollPos = scrollCapas.scrollLeft;
-
-                    const scrollTotal = scrollCapas.scrollWidth;
-                    const scrollInteract =
-                      scrollCapas.scrollLeft + scrollCapas.clientWidth;
-
-                    console.log(scrollTotal);
-                    console.log(scrollInteract);
-
-                    if (scrollTotal >= scrollInteract) {
-                      scrollCapas.scrollTo({
-                        left: scrollPos + 10,
-                        behavior: "smooth",
-                      });
-                    }
-                  }, 500);
-                  */
                 }
               }}
               onMouseUp={(e) => {

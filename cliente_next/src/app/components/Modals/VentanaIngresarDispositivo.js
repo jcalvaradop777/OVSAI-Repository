@@ -5,20 +5,30 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingInIcon } from "@heroicons/react/20/solid";
 import { ArrowsPointingOutIcon } from "@heroicons/react/20/solid";
 
-export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar }) {
-
+export default function VentanaIngresarDispositivo({
+  id,
+  mostrar,
+  setMostrar,
+}) {
   const [load, setLoad] = useState(false);
   const [dispositivos, setDispositivos] = useState([]);
   const [actualizarDispositivos, setActualizarDispositivos] = useState(false);
   const [pantallaCompleta, setPantallaCompleta] = useState(false);
 
   const obtenerDispositivos = async () => {
-    const response = await fetch("/api/dispositivos/get/" + id);  // el id es el identificador de la estación
+    const response = await fetch("/api/dispositivos/get/" + id); // el id es el identificador de la estación
     await response
       .json()
       .then((res) => {
-        console.log("res", res);
-        setDispositivos(res.results);
+        if(response.ok) {
+          if (res.success) {
+            setDispositivos(res.results);
+          } else {
+            console.warn(res.message);
+          }
+        } else {
+          console.error("Ha ocurrido un error al solicitar los dispositivos");
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -35,22 +45,23 @@ export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar }) 
     }
 
     window.addEventListener("keydown", (e) => {
-      if(e.key === "Escape") {
+      if (e.key === "Escape") {
         setMostrar(false);
       }
-    })
+    });
   }, [load, dispositivos, actualizarDispositivos]);
 
   return (
     <>
       {mostrar ? (
         <div className="fixed block w-full h-full m-0 p-0 z-[100] top-0 left-0 bg-[rgba(0,0,0,0.5)] overflow-y-auto mb-10">
-
           <div
-            className={`block ml-auto mr-auto p-0 relative ${pantallaCompleta ? "w-full h-full" : "top-1/4 max-w-sm min-w-44 bottom-10"
-              } rounded-xl`}
+            className={`block ml-auto mr-auto p-0 relative ${
+              pantallaCompleta
+                ? "w-full h-full"
+                : "top-1/4 max-w-sm min-w-44 bottom-10"
+            } rounded-xl`}
           >
-
             <div className="flex items-center justify-center bg-[#82A53D]">
               <h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-white ml-auto">
                 <b>Dispositivos</b>
@@ -63,9 +74,11 @@ export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar }) 
                   setPantallaCompleta(!pantallaCompleta);
                 }}
               >
-                {pantallaCompleta
-                  ? <ArrowsPointingInIcon className="h-5 w-5" /> // iciono maximiza o maximiza
-                  : <ArrowsPointingOutIcon className="h-5 w-5" />}
+                {pantallaCompleta ? (
+                  <ArrowsPointingInIcon className="h-5 w-5" /> // iciono maximiza o maximiza
+                ) : (
+                  <ArrowsPointingOutIcon className="h-5 w-5" />
+                )}
               </button>
 
               <button
@@ -75,7 +88,7 @@ export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar }) 
                   setMostrar(false);
                 }}
               >
-                <XMarkIcon  // icono cerrar
+                <XMarkIcon // icono cerrar
                   width="20"
                   height="20"
                 />
@@ -96,7 +109,6 @@ export default function VentanaIngresarDispositivo({ id, mostrar, setMostrar }) 
                 </section>
               </div>
             </section>
-
           </div>
         </div>
       ) : (

@@ -3,6 +3,7 @@
 import {
   BuildingLibraryIcon,
   ChatBubbleOvalLeftIcon,
+  DocumentIcon,
   HomeIcon,
   InboxIcon,
 } from "@heroicons/react/20/solid";
@@ -11,11 +12,13 @@ import { usePathname } from "next/navigation";
 
 // Componentes
 import Estacion from "./Estaciones/FrmIngresarEstacion";
-import FiltrosEstaciones from "./Estaciones/FiltrosEstaciones";
 import { ENV } from "@/config/env";
 import { useEffect, useState } from "react";
-import { runOVSAIBot } from "@/OVSAIBot";
+import { cargarBoletin, runOVSAIBot } from "@/OVSAIBot";
 import { EnterFullScreenIcon } from "@radix-ui/react-icons";
+import { Input, Tooltip } from "@nextui-org/react";
+import Image from "next/image";
+
 export default function Sidebar({
   Modal,
   setModal,
@@ -49,12 +52,19 @@ export default function Sidebar({
 
   const [last, setLast] = useState(null);
   const [estaciones, setEstaciones] = useState([]);
+  const [queryEstacion, setQueryEstacion] = useState("");
+  const [filterEstacion, setFilterEstacion] = useState("");
+  const [filtroEstaciones, setFiltroEstaciones] = useState([]);
+  const [Loading, setLoading] = useState(true);
+
+  // Estados del chat de IA
   const [chat, setChat] = useState(false);
   const [mensajes, setMensajes] = useState([]);
   const [mensaje, setMsg] = useState("");
-  const [Loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
-  const [chatFullScreen, setChatFullScreen] = useState(false); 
+  const [chatFullScreen, setChatFullScreen] = useState(false);
+  const [boletinActivado, setActivarBoletin] = useState(false);
+  // ----
 
   const handleEnviarMensaje = () => {
     const obtenerBox = document.querySelector("#mensajes-chat");
@@ -69,7 +79,7 @@ export default function Sidebar({
 
       // Hacer la pregunta
 
-      runOVSAIBot(mensaje, data)
+      runOVSAIBot(mensaje, data, boletinActivado)
         .then((res) => {
           setMensajes((lastMessags) => [
             ...lastMessags,
@@ -78,6 +88,7 @@ export default function Sidebar({
               msg: res,
             },
           ]);
+          setActivarBoletin(false);
         })
         .catch((err) => {
           console.log(err);
@@ -94,7 +105,8 @@ export default function Sidebar({
   };
 
   const obtenerDatos = async () => {
-    const datos = await fetch("/api/ovsaibot/data-train/get/");
+    try {
+      const datos = await fetch("/api/ovsaibot/data-train/get/");
     const respuesta = await datos.json();
 
     if (respuesta && Array.isArray(respuesta) && respuesta.length > 0) {
@@ -106,42 +118,62 @@ export default function Sidebar({
         }),
       ]);
     }
+    } catch(err) {
+      console.error("Los datos de entrenamiento de la IA, no se pudieron cargar");
+      
+    }
   };
 
   useEffect(() => {
     if (_Map != null || _Map != undefined) {
       if (last != _Map.markers.length) {
-        obtenerEstaciones()
-          .then((res) => {
-            setEstaciones(res);
-            if (Array.isArray(res)) setLast(res.length);
-          })
-          .catch((err) => console.error(err));
+        try {
+          obtenerEstaciones()
+            .then((res) => {
+              setEstaciones(res);
+              setFiltroEstaciones(res);
+              if (Array.isArray(res)) setLast(res.length);
+            })
+            .catch((err) => console.error(err));
+        } catch (err) {
+          console.error("No se pueden cargar las estaciones");
+        }
       }
 
       if (Loading) {
         obtenerDatos();
-        
 
         setLoading(false);
       }
     }
-  }, [_Map, last]);  
+  }, [_Map, last]);
+
+  useEffect(() => {
+    if (estaciones.length > 0) {
+      setFiltroEstaciones([
+        ...estaciones.filter(
+          (estacion) =>
+            estacion.id.toLowerCase().includes(queryEstacion) ||
+            estacion.nombre.toLowerCase().includes(queryEstacion)
+        ),
+      ]);
+    }
+  }, [queryEstacion, filterEstacion]);
 
   return (
     <>
-      <div className="fixed flex flex-col bg-clip-border bg-white text-gray-700 h-[calc(100vh)] max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5 z-50">
-        <div className="flex items-center justify-center">
-          <img src="logoSgc2.jpg" className="w-64 h-auto" />
+      <div className="sidebar shadow-xl shadow-blue-gray-900/5">
+        <div className="sidebar-icon">
+          <Image width={320} height={100} src="/logoSgc2.webp" />
         </div>
 
-        <div className="flex items-center justify-center bg-[#82A53D]">
-          <h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-white">
+        <div className="sidebar-titulo-box">
+          <h5 className="sidebar-titulo">
             <b>OVSAI</b>
           </h5>
         </div>
 
-        <nav className="flex flex-col gap-1 w-full p-2 font-sans text-base font-normal text-gray-700">
+        <nav className="sidebar-nav">
           <Link
             href={"/"}
             className="flex w-full justify-between rounded-lg bg-purple-100 px-4 py-2 text-left text-sm font-medium text-purple-900 hover:bg-purple-200 focus:outline-none focus-visible:ring focus-visible:ring-purple-500/75"
@@ -197,12 +229,43 @@ export default function Sidebar({
                     </span>
                   </li>
                 </ul>
-
-                <FiltrosEstaciones
+                <div className="flex w-full flex-wrap gap-4 mt-1">
+                  <Input
+                    type="text"
+                    placeholder="Buscar estación"
+                    onValueChange={(value) => {
+                      if (value.trim() != queryEstacion)
+                        setQueryEstacion(value.trim());
+                    }}
+                  />
+                  {filtroEstaciones.length > 0 ? (
+                    <ul>
+                      {filtroEstaciones.map((estacion, i) => {
+                        return (
+                          <li key={`estacion-${i}`} className="m-2 w-full p-2 cursor-pointer">
+                            {estacion.id} : {estacion.nombre}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <>
+                      {estaciones.length == 0 ? (
+                        <div className="p-2 w-full mt-2">No hay estaciones</div>
+                      ) : estaciones.length > 0 &&
+                        filtroEstaciones.length == 0 ? (
+                        <div className="p-2 w-full mt-2">No hay resultados</div>
+                      ) : (
+                        <></>
+                      )}
+                    </>
+                  )}
+                </div>
+                {/* <FiltrosEstaciones
                   datos={estaciones}
                   setEstaciones={setEstaciones}
                   campos={["id", "nombre"]}
-                />
+                /> */}
               </details>
             </>
           ) : (
@@ -262,6 +325,21 @@ export default function Sidebar({
             >
               <EnterFullScreenIcon width={30} height={30} />
             </button>
+            <Tooltip
+              placement="top"
+              content={<b>Activar boletin</b>}
+              color="primary"
+            >
+              <button
+                onClick={() => {
+                  setActivarBoletin(true);
+                  cargarBoletin();
+                }}
+                className="cursor-pointer select-none p-2 rounded-md absolute right-9 top-0"
+              >
+                <DocumentIcon width={30} height={30} />
+              </button>
+            </Tooltip>
           </section>
           <section
             id="mensajes-chat"

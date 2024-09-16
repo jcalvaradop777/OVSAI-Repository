@@ -183,12 +183,11 @@ export default function MenuContext({
       {mostrarAnomalias ? (
         <>
         <ModalBasic mostrar={mostrarAnomalias} setMostrar={setAnomalias} contenido={
-          <h1>Hola</h1>
-        } />
-        {/* <VentanaAnomalias
+          <VentanaAnomalias
           mostrarAnomalias={mostrarAnomalias}
           setAnomalias={setAnomalias}
-        /> */}
+        />
+        } />
         </>
         
       ) : (
