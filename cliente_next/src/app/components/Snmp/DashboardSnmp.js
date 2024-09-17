@@ -32,7 +32,6 @@ let tiposTraza = [
 ];
 
 export default function VentanaSnmp({ setVentana, id_serial }) {
-
   const [datos, setDatos] = useState([]);
 
   useEffect(() => {
@@ -40,13 +39,12 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
       if (e.key === "Escape") {
         setVentana(false);
       }
-    })
-  })
+    });
+  });
 
   useEffect(() => {
     obtenerSnmp();
-  }, []); // los corchetes vacios, es para que sólo se ejecuta una sola vez, cuando se cargue el componente. 
-
+  }, []); // los corchetes vacios, es para que sólo se ejecuta una sola vez, cuando se cargue el componente.
 
   // Función para llamar a los SNMP de la base de datos
   const obtenerSnmp = async () => {
@@ -54,10 +52,16 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
     await response
       .json()
       .then((res) => {
-        console.log("resSNMP", res.results);
-        //console.log("resSNMP - upstream_signal:", res.results[0]?.date);
-        setDatos(res.results);
-        //console.log("datos", datos);
+        if (response.ok) {
+          if (res.success) {
+            console.log("resSNMP", res.results);
+            setDatos(res.results);
+          } else {
+            console.error(res.message);
+          }
+        } else {
+          console.error("Ha ocurrido un error");
+        }
       })
       .catch((err) => console.error(err));
   };
@@ -67,7 +71,6 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
       <div
         className={`block ml-auto mr-auto p-0 relative "w-full h-full" rounded-xl`}
       >
-
         <div className="flex items-center justify-center bg-[#82A53D] p-4">
           <h5 className="text-center antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-white">
             <b>DashBoard de metadatos SNMP</b>
@@ -80,7 +83,7 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
               setVentana(false);
             }}
           >
-            <XMarkIcon  // icono cerrar
+            <XMarkIcon // icono cerrar
               width="20"
               height="20"
             />
@@ -92,8 +95,11 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
           className="p-2 relative block bg-slate-100 text-slate-800"
         >
           <div className="flex">
-            ${id_serial}
-            ${datos[0]?.date}
+            {datos != null && Array.isArray(datos) && datos.length > 0 ? (
+              `${id_serial} | ${datos[0]?.date}`
+            ) : (
+              <></>
+            )}
           </div>
 
           {/* DashBoard */}
@@ -115,12 +121,19 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
                     textinfo: "text+percent", // Display slice percentages as text
                   },
                 ]}
-                layout={{ width: 500, height: 500, title: "Porcentaje de funcionamiento: Arles" }}
+                layout={{
+                  width: 500,
+                  height: 500,
+                  title: "Porcentaje de funcionamiento: Arles",
+                }}
               />
             </div>
 
             <div className="w-full flex flex-col shadow-lg p-2 place-content-center place-items-center items-center">
-              <Autocomplete label="Seleccionar tipo" className="max-w-xs me-auto">
+              <Autocomplete
+                label="Seleccionar tipo"
+                className="max-w-xs me-auto"
+              >
                 {tiposTraza.map((tipo) => (
                   <AutocompleteItem key={tipo.value} value={tipo.value}>
                     {tipo.label}
@@ -132,7 +145,14 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
                 data={[
                   {
                     type: "bar", // Change type to 'bar' for bar charts
-                    x: ["Nulo", "Atípico 2", "Salto", "Disperso", "Intermitente", "Desplazado"], // Array of category labels
+                    x: [
+                      "Nulo",
+                      "Atípico 2",
+                      "Salto",
+                      "Disperso",
+                      "Intermitente",
+                      "Desplazado",
+                    ], // Array of category labels
                     y: [40, 12, 60, 72, 38, 56], // Array of data values for each category
                     // Add these properties to customize the bar chart
                     marker: {
@@ -158,8 +178,8 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
                 data={[
                   {
                     type: "line", // Change type to 'line' for line charts
-                    x: [...datos?.map(d=>d.date)], // mapeo de fechas, con los ... se le dice que todas las fechas van en esa matriz
-                    y: [...datos?.map(t=>t.temperature)], // Array of y-axis values (mountain-like pattern)
+                    x: [...datos?.map((d) => d.date)], // mapeo de fechas, con los ... se le dice que todas las fechas van en esa matriz
+                    y: [...datos?.map((t) => t.temperature)], // Array of y-axis values (mountain-like pattern)
                     // Add these properties to customize the line chart
                     line: {
                       color: "green", // Set line color (optional)
@@ -245,11 +265,8 @@ export default function VentanaSnmp({ setVentana, id_serial }) {
                 </TableBody>
               </Table>
             </div>
-
           </div>
-
         </section>
-
       </div>
     </div>
   );

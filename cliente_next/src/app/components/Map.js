@@ -8,7 +8,6 @@ import IngresarEstacion from "./Estaciones/FrmIngresarEstacion";
 import MenuContext from "./Estaciones/MenuCtx";
 import Image from "next/image";
 import { Tooltip } from "@nextui-org/react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { TemperatureLayer, WindLayer } from "@maptiler/weather";
 
 export default function Map({
@@ -20,9 +19,11 @@ export default function Map({
   setSelected,
   setShow,
   show,
+  mapStyle,
+  setMapStyle,
+  map
 }) {
   const mapContainer = useRef(null);
-  const map = useRef(null);
   const ovspa = { lng: -77.253837, lat: 1.209139 }; // posición del observatorio vulcanológico de Pasto
   const [Mposition, setMposition] = useState({
     x: 0,
@@ -70,8 +71,7 @@ export default function Map({
       src: "/layers-map/weather-style.PNG",
       setStyle: "weather",
     },
-  ]);
-  const [mapStyle, setMapStyle] = useState("hybrid");
+  ]);  
 
   maptilersdk.config.apiKey = ENV.API_KEY;
 
@@ -312,7 +312,7 @@ export default function Map({
           onClick={() => {
             setShowCapas(!showCapas);
           }}
-          className="z-[500] p-0 rounded-lg bg-white left-[300px] bottom-14 fixed cursor-pointer select-none"
+          className="z-[90] p-0 rounded-lg bg-white left-[340px] bottom-14 fixed cursor-pointer select-none"
         >
           <Image
             src={"/layers-map/satellite-style.jpeg"}
@@ -326,7 +326,7 @@ export default function Map({
       {showCapas ? (
         <ul
           id="capas-box"
-          className="left-[365px] list-none p-2 rounded-lg bottom-14 fixed w-64 h-20 overflow-x-hidden flex flex-row gap-2 overflow-y-hidden bg-white"
+          className="left-[415px] list-none p-2 rounded-lg bottom-14 fixed w-64 h-24 overflow-x-auto flex flex-row gap-2 overflow-y-hidden bg-white"
         >
           {capas.map((capa, index) => {
             return (
@@ -354,60 +354,6 @@ export default function Map({
               </Tooltip>
             );
           })}
-          <Tooltip placement="top" content="Siguiente">
-            <ChevronRightIcon
-              onClick={() => {
-                const scrollCapas = document.querySelector("#capas-box");
-                const scrollPos = scrollCapas.scrollLeft;
-
-                const scrollTotal = scrollCapas.scrollWidth;
-                const scrollInteract =
-                  scrollCapas.scrollLeft + scrollCapas.clientWidth;
-
-                console.log(scrollTotal);
-                console.log(scrollInteract);
-
-                if (scrollTotal >= scrollInteract) {
-                  scrollCapas.scrollTo({
-                    left: scrollPos + 10,
-                    behavior: "smooth",
-                  });
-                }
-              }}
-              onMouseUp={(e) => {
-                if (e.button == 0) {
-                }
-              }}
-              width={70}
-              height={120}
-              className="cursor-pointer select-none text-black fixed bottom-[35px] left-[560px]"
-            />
-          </Tooltip>
-          <Tooltip placement="top" content="Anterior">
-            <ChevronLeftIcon
-              onClick={() => {
-                const scrollCapas = document.querySelector("#capas-box");
-                const scrollPos = scrollCapas.scrollLeft;
-
-                const scrollTotal = scrollCapas.scrollWidth;
-                const scrollInteract =
-                  scrollCapas.scrollLeft + scrollCapas.clientWidth;
-
-                console.log(scrollTotal);
-                console.log(scrollInteract);
-
-                if (scrollTotal >= scrollInteract) {
-                  scrollCapas.scrollTo({
-                    left: scrollPos - 10,
-                    behavior: "smooth",
-                  });
-                }
-              }}
-              width={70}
-              height={120}
-              className="cursor-pointer select-none text-black fixed bottom-[35px] left-[360px]"
-            />
-          </Tooltip>
         </ul>
       ) : (
         <></>

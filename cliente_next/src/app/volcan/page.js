@@ -1,23 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Map from "../components/Map";
 import ListSearch from "../components/ListSearch";
-
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Basic from "../components/Modals/Basic";
-import SNMPDispositivo from "../snmp/page";
 
 export default function Volcan() {
-  const [volcanes] = useState([
-    //  Volcanes de prueba para el mapa
-    { name: "Volcán Galeras", lat: 1.2166666666667, long: -77.366666666667 },
-    { name: "Volcán Chiles", lat: 0.82111111, long: -77.935 },
-    { name: "Volcán Cumbal", lat: 0.95583333333333, long: -77.883333333333 },
-    { name: "OVSPA", lat: 1.210545, long: -77.257391 },
-  ]);
-
   // Estado para manejar ventana modal de estación
   const [Modal, setModal] = useState({
     title: null,
@@ -37,20 +27,10 @@ export default function Volcan() {
     reload: true,
   });
 
-  // Estado para manejar la recarga de las estaciones en el Sidebar
-  // true -> se vuelven a cargar las estaciones
-  // false -> no se carga
-  //const [recargarEstaciones, setRecargarEstaciones] = useState(true);
+  // Estilo del mapa
+  const [mapStyle, setMapStyle] = useState("hybrid");
 
-  useEffect(() => {
-    const adMap = document.querySelector(".maplibregl-control-container");
-
-    if (adMap) {
-      //adMap.remove();
-    }
-  }, [_Map]);
-
-  const router = useRouter();
+  const map = useRef(null);
 
   const getContent = () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -67,10 +47,11 @@ export default function Volcan() {
             setSelected={setSelected}
             setShow={setShow}
             show={show}
+            mapStyle={mapStyle}
+            setMapStyle={setMapStyle}
+            map={map}
           />
         );
-      case "/snmp":
-        return <SNMPDispositivo />;
       default:
         return <h1>No encontrado</h1>;
     }
@@ -94,8 +75,11 @@ export default function Volcan() {
           setShow={setShow}
           selected={selected}
           setSelected={setSelected}
+          mapStyle={mapStyle}
+          setMapStyle={setMapStyle}
+          map={map}
         />
-        <ListSearch volcanes={volcanes} />
+        <ListSearch />
         {getContent()}
       </div>
     </>

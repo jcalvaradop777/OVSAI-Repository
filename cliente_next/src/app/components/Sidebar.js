@@ -5,7 +5,6 @@ import {
   ChatBubbleOvalLeftIcon,
   DocumentIcon,
   HomeIcon,
-  InboxIcon,
 } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -14,14 +13,16 @@ import { usePathname } from "next/navigation";
 import Estacion from "./Estaciones/FrmIngresarEstacion";
 import { ENV } from "@/config/env";
 import { useEffect, useState } from "react";
-import { cargarBoletin, runOVSAIBot } from "@/OVSAIBot";
+import {
+  cargarBoletin,
+  cargarEstacionesOVSAIBot,
+  runOVSAIBot,
+} from "@/OVSAIBot";
 import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Input, Tooltip } from "@nextui-org/react";
 import Image from "next/image";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRobot } from "@fortawesome/free-solid-svg-icons";
-import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 
 export default function Sidebar({
   Modal,
@@ -31,6 +32,9 @@ export default function Sidebar({
   selected,
   setSelected,
   setShow,
+  mapStyle,
+  setMapStyle,
+  map
 }) {
   const pathname = usePathname();
 
@@ -93,6 +97,28 @@ export default function Sidebar({
             },
           ]);
           setActivarBoletin(false);
+
+          if (res != undefined || res != null) {
+            if (res.toLowerCase().match(/change:layer/)) {
+              let format_output =
+                typeof res === "string"
+                  ? res.replace(/- change:layer/gi, "").trim()
+                  : "";
+              format_output = JSON.parse(format_output);
+              const result = Object.keys(format_output).filter(
+                (f) => format_output[f] == true
+              );
+
+              if (result[0] != null) {
+                setMapStyle(result[0]);
+                map.current = null;
+                _setMap({
+                  ..._Map,
+                  reload: true,
+                });
+              }
+            }
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -147,7 +173,8 @@ export default function Sidebar({
 
       if (Loading) {
         obtenerDatos();
-
+        cargarEstacionesOVSAIBot(); // Cargar o pasar las estaciones actuales, a OVSAIBot
+        cargarBoletin(); // Cargar el documento/boletin a OVSAIBot
         setLoading(false);
       }
     }
@@ -169,7 +196,12 @@ export default function Sidebar({
     <>
       <div className="sidebar shadow-xl shadow-blue-gray-900/5">
         <div className="sidebar-icon">
-          <Image width={320} height={100} src="/logoSgc2.webp" />
+          <Image
+            width={320}
+            height={100}
+            src="/logoSgc2.jpg"
+            alt="Logo del Servicio Geológico Colombiano"
+          />
         </div>
 
         <div className="sidebar-titulo-box">
@@ -244,12 +276,12 @@ export default function Sidebar({
                     }}
                   />
                   {filtroEstaciones.length > 0 ? (
-                    <ul>
+                    <ul className="overflow-y-auto max-h-72 w-full box-border overflow-x-hidden">
                       {filtroEstaciones.map((estacion, i) => {
                         return (
                           <li
                             key={`estacion-${i}`}
-                            className="m-2 w-full p-2 cursor-pointer"
+                            className="m-2 w-full p-2 cursor-pointer box-border"
                           >
                             {estacion.id} : {estacion.nombre}
                           </li>
@@ -312,7 +344,7 @@ export default function Sidebar({
 
       {/* Burbuja CHAT*/}
       <button
-        className="fixed w-10 h-10 left-[300px] bottom-2 z-[2000]  text-[#82A53D] hover:animate-pulse hover:w-12 hover:h-12"
+        className="fixed w-10 h-10 left-[350px] bottom-2 z-[100]  text-[#82A53D] hover:animate-pulse hover:w-12 hover:h-12"
         onClick={() => {
           setChat(!chat);
         }}
@@ -323,8 +355,8 @@ export default function Sidebar({
       {chat ? (
         <div
           className={`fixed ${
-            chatFullScreen ? "w-full h-full" : "w-72 h-96 left-[350px]"
-          } p- bottom-2 box-border bg-slate-200 z-[2000]`}
+            chatFullScreen ? "w-full h-full" : "w-72 h-96 left-[400px]"
+          } p- bottom-2 box-border bg-slate-200 z-[100]`}
         >
           <section className="relative w-full box-border p-2 bg-[#82A53D] flex flex-row gap-1-">
             <span className="align-middle justify-center">OVSAIBot</span>

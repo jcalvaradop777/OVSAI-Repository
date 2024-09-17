@@ -2,79 +2,41 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ObtenerEstaciones } from "./funciones";
 import pdfToText from "react-pdftotext";
 
-let estaciones = [];
-
-function obtenerFechaHoraActual() {
-  // Crea un nuevo objeto Date para obtener la fecha y hora actuales
-  const ahora = new Date();
-
-  // Extrae los componentes de la fecha y hora
-  const dia = ahora.getDate();
-  const mes = ahora.getMonth() + 1; // Los meses en JavaScript comienzan en 0
-  const año = ahora.getFullYear();
-  const horas = ahora.getHours();
-  const minutos = ahora.getMinutes();
-
-  const meses = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
-
-  // Formatea la fecha y hora como una cadena
-  const fechaHora = `${dia} de ${
-    meses[mes - 1]
-  } de ${año} a las ${horas}:${minutos} UTC `;
-
-  return fechaHora;
-}
-/* 
-function obtenerEstaciones() {
-  return estaciones;
-} */
-
-function crearEstacion(data) {
-  const objeto = JSON.parse(data);
-  estaciones.push({
-    nombre_estacion: objeto.nombre_estacion,
-    id_estacion: objeto.id_estacion,
-    trazas: objeto.trazas,
-  });
-
-  console.log(estaciones);
-
-  return "La estación ha sido creada";
-}
-
 const genAI = new GoogleGenerativeAI("AIzaSyBysod8t2m9m_S-nFjUKhTS6hQpg89M51g");
 
 const historyUser = [];
 let textoPdf = "";
+let estaciones = [];
+
+export const cargarEstacionesOVSAIBot = async () => {
+  await ObtenerEstaciones()
+    .then((res) => {
+      if (res.success) {
+        estaciones = res;
+      } else {
+        estaciones = [];
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
 
 // Leer documento pdf, función
 
-const readDocumentRemote = async (pdf_url) => {
+export const readDocumentRemote = async (pdf_url) => {
   const file = await fetch(pdf_url)
     .then((res) => res.blob())
     .catch((error) => console.error(error));
 
   pdfToText(file)
-    .then((text) => (textoPdf = text))
+    .then((text) => (textoPdf = `Este es el boletin de OVSAI: ${text}`))
     .catch((error) => console.error("Failed to extract text from pdf"));
 };
 
 // ---
 
-const parts = [
+/* const parts = [
   { text: "Tu eres OVSAIBot, tu asistente en OVSAI" },
   {
     text: "Si te preguntan que puedes hacer, responde: Proporcionar información sobre OVSAI, Proporcionar información de las estaciones, Responder preguntas sobre las estaciones y sensores",
@@ -109,25 +71,57 @@ const parts = [
   {
     text: "Si no sabes que responder, solo di que no entiendes",
   },
-];
+]; */
 
 const functionsTextOvsai = [
   {
-    text: "Las estaciones de OVSAI son: " + estaciones
+    text: "Eres OVSAIBot un asistente entrenado para proporcionar información sobre el proyecto OVSAI, liderado en la ciudad de Pasto. Debes proporcionar información sobre estaciones, volcanes y boletines si te los proporcionan.",
+  },
+  {
+    text:
+      "Si te piden que muestres las estaciones, muestra lo siguiente: " +
+      [...estaciones.map((estacion) => estacion.nombre)],
+  },
+  {
+    text: `    
+    Nota importante: esto son estilos!!. Y solo debes mostrar lo siguiente en adelante:
+    Si te piden cambiar a otro estilo, pregunta a cual de las siguientes estilos quiere cambiar:
+      - Básico
+      - Híbrido
+      - Outdoor
+      - Calles
+      - Relieve
+      - Temperatura
+      - Clima
+      - Satélite (Sin leyendas)
+
+      Ahora, el usuario solo puede elegir una capa. Si desea elegir más dile que no se puede.
+      En el caso de que el usuario elija una, debes responder la siguiente estructura, si eligio por ejemplo el de satélite:
+      Debe ser requeridamente de esta forma el objeto: {"basic": false, "hybrid": false, "outdoor": false, "satellite": true, "streets": false, "winter": false, "temperature": false, "weather": false}
+      Y al final de ese objeto, separalo por un - guión, y agrega el texto: change:layer
+    `,
+  },
+  {
+    text: "No puedes responder sobre otros temas que no sean sobre OVSAI",
+  },
+  {
+    text: "No te puedes inventar ninguna información, todo debes buscarlo aquí",
+  },
+  {
+    text: "Si te piden responder sobre alguna información que el usuario te haya proporcionado, como un boletin, un texto o algo similar. Debes responder las preguntas que te hace"
   }
-]
+];
 
 export const cargarBoletin = () => {
-  if (textoPdf.trim().length == 0) {
-    readDocumentRemote("boletines/Boletin_volcanes_sur_jun_2024.pdf")
-      .then((res) => {
-        //textoPdf = res;
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+  //if (textoPdf.trim().length == 0) {
+  readDocumentRemote("boletines/Boletin_volcanes_sur_jun_2024.pdf")
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  //}
 };
 
 export async function runOVSAIBot(
@@ -167,6 +161,10 @@ export async function runOVSAIBot(
     },
   });
 
+  /*     generationConfig: {
+      responseMimeType: "application/json"
+    } */
+
   const generationConfig = {
     temperature: 1.25,
     topP: 0.95,
@@ -177,7 +175,12 @@ export async function runOVSAIBot(
 
   let result = await model
     .startChat({
-      history: [{ role: "user", parts: [...dataTrain, ...functionsTextOvsai, ...historyUser] }],
+      history: [
+        {
+          role: "user",
+          parts: [...dataTrain, ...functionsTextOvsai, ...historyUser],
+        },
+      ],
       generationConfig: generationConfig,
     })
     .sendMessage(answer);
@@ -195,28 +198,25 @@ export async function runOVSAIBot(
 
   console.log(text);
 
-  if (text.match(/crear:estacion/)) {
+  /* if (text.match(/crear:estacion/)) {
     const repla = text
       .replace(/`/gi, "")
       .replace(/json/g, "")
       .replace(/crear:estacion/g, "");
     const estacion = crearEstacion(repla);
     textoFuncion = estacion;
-  }
+  } */
 
-  if (text.toLowerCase().match(/mostrar:estaciones/)) {
-    textoFuncion = `${[
-      ...(await ObtenerEstaciones().then((res) => res.map((e) => e.nombre))),
-    ]}`;
-    estaciones = await ObtenerEstaciones();
-  }
-
-  /* if (text.toLowerCase().match(/cambiar:capa/)) {
+  /* if (text.toLowerCase().match(/mostrar:estaciones/)) {
     textoFuncion = `${[
       ...(await ObtenerEstaciones().then((res) => res.map((e) => e.nombre))),
     ]}`;
     estaciones = await ObtenerEstaciones();
   } */
+
+  if (text.toLowerCase().match(/change:layer/)) {
+    textoFuncion = `La capa se ha cambiado correctamente`;
+  }
 
   return textoFuncion != null ? textoFuncion : text;
 }
